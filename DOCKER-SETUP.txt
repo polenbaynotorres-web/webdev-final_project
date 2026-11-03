@@ -1,0 +1,99 @@
+# TORRES VEHICLE RENTAL - DOCKER SETUP
+
+## Docker Environment
+
+This setup runs the Symfony project using:
+
+- Symfony / PHP with Apache
+- MySQL 8.0
+- phpMyAdmin
+
+## Access URLs
+
+- Symfony application: http://localhost:8000
+- phpMyAdmin: http://localhost:8081
+- MySQL from Windows: 127.0.0.1:3308
+
+## Docker Services
+
+- App container: `torres_symfony_app`
+- MySQL container: `torres_mysql`
+- phpMyAdmin container: `torres_phpmyadmin`
+
+## Starting the Project
+
+Open PowerShell in the Symfony project root:
+
+    docker compose config
+    docker compose up -d --build
+
+Check running containers:
+
+    docker compose ps
+
+View application logs:
+
+    docker compose logs -f app
+
+## phpMyAdmin Login
+
+- Server: `database`
+- Username: `torres_app`
+- Password: Use the local `.env` file.
+
+## Database Configuration
+
+- Database: `torres_rental`
+- MySQL container hostname: `database`
+- MySQL container port: `3306`
+- Windows host port: `3308`
+
+Database credentials are stored in the local `.env` file and must not be committed to GitHub.
+
+## Database Import
+
+The original project archive contains:
+
+    database/schema.sql
+
+The SQL file may contain commands that drop and recreate the `torres_rental` database.
+
+Import it only when initializing an empty database. Do not import it into a database containing records that must be preserved.
+
+The Docker database uses a persistent volume:
+
+    torres_mysql_data
+
+Do not delete this volume unless you intentionally want to remove the stored database data.
+
+## Useful Docker Commands
+
+Start containers:
+
+    docker compose start
+
+Stop containers:
+
+    docker compose stop
+
+View container status:
+
+    docker compose ps
+
+View application logs:
+
+    docker compose logs -f app
+
+Stop and remove containers without deleting database data:
+
+    docker compose down
+
+IMPORTANT:
+Never run `docker compose down -v` unless you intentionally want to delete the persistent MySQL database volume.
+
+## Important Notes
+
+- Keep `.env` private and excluded from Git.
+- Do not commit passwords, API keys, or production secrets.
+- Use the Docker hostname `database` and port `3306` for connections from inside containers.
+- Use `127.0.0.1:3308` for MySQL connections from Windows.

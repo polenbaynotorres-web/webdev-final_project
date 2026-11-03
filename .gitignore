@@ -18,3 +18,8 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+# Environment variables and secrets
+/.env
+/.env.*
+!/.env.example

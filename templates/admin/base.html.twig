@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %}Admin | Torres Vehicle Rental{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="{{ asset('assets/css/admin.css') }}">
+
+    {% block stylesheets %}{% endblock %}
+</head>
+
+<body class="admin-body">
+
+    <aside class="admin-sidebar">
+
+        <a
+            class="admin-brand"
+            href="{{ path('admin_dashboard') }}"
+            aria-label="Torres Vehicle Rental dashboard"
+        >
+            <img
+                src="{{ asset('images/logo-cropped.png') }}"
+                alt="Torres Vehicle Rental logo"
+            >
+        </a>
+
+        <div class="sidebar-label">MAIN MENU</div>
+
+        <nav class="sidebar-nav">
+            <a
+                class="{% if app.request.attributes.get('_route') == 'admin_dashboard' %}active{% endif %}"
+                href="{{ path('admin_dashboard') }}"
+            >
+                <span aria-hidden="true">▦</span>
+                Dashboard
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="/">↗ View Homepage</a>
+        </div>
+
+    </aside>
+
+    <main class="admin-main">
+
+        <header class="admin-topbar">
+            <div class="admin-breadcrumb">
+                <span>Torres Vehicle Rental</span>
+                <span class="breadcrumb-separator">/</span>
+                <span>Administration</span>
+            </div>
+
+            <div class="admin-user">
+                <span class="admin-user-avatar" aria-hidden="true">A</span>
+                <span>Administrator</span>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            {% block body %}{% endblock %}
+        </div>
+
+    </main>
+
+    {% block javascripts %}{% endblock %}
+
+</body>
+</html>
