@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Dashboard | Torres Vehicle Rental{% endblock %}
+
+{% block stylesheets %}
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f3f5f8;
+        color: #1e293b;
+    }
+
+    .navbar {
+        background: #1e293b;
+        color: white;
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .navbar h2 {
+        margin: 0;
+        font-size: 20px;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .welcome {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .welcome h1 {
+        margin-top: 0;
+    }
+
+    .logout-button {
+        background: #dc2626;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .logout-button:hover {
+        background: #b91c1c;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<header class="navbar">
+    <h2>Torres Vehicle Rental</h2>
+
+    <form method="post" action="{{ path('app_logout') }}">
+        <input type="hidden" name="_csrf_token"
+               value="{{ csrf_token('logout') }}">
+        <button type="submit" class="logout-button">Logout</button>
+    </form>
+</header>
+
+<main class="container">
+    <section class="welcome">
+        <h1>Welcome, {{ app.user.name }}!</h1>
+        <p>You are successfully logged in as a customer.</p>
+    </section>
+</main>
+{% endblock %}
