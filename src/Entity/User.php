@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -19,20 +21,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 120)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 190, nullable: true)]
+    #[ORM\Column(length: 190, nullable: true, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 60, nullable: true)]
+    #[ORM\Column(length: 60, nullable: true, unique: true)]
     private ?string $username = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(name: 'password_hash', length: 255)]
     private ?string $passwordHash = null;
 
-    #[ORM\Column(type: 'string', columnDefinition: "ENUM('user','admin')")]
-    private ?string $role = null;
+    #[ORM\Column(
+        name: 'role',
+        columnDefinition: "ENUM('user','admin') NOT NULL DEFAULT 'user'"
+    )]
+    private ?string $role = 'user';
 
-    #[ORM\Column(name: 'created_at', type: 'datetime')]
+    #[ORM\Column(
+        name: 'created_at',
+        columnDefinition: 'DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP'
+    )]
     private ?\DateTime $createdAt = null;
+
+    /**
+     * @var Collection<int, Message>
+     */
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'user')]
+    private Collection $messages;
+
+    /**
+     * @var Collection<int, Subscriber>
+     */
+    #[ORM\OneToMany(targetEntity: Subscriber::class, mappedBy: 'user')]
+    private Collection $subscribers;
+
+    public function __construct()
+    {
+        $this->messages = new ArrayCollection();
+        $this->subscribers = new ArrayCollection();
+        $this->createdAt = new \DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -47,7 +74,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -59,7 +85,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(?string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -76,7 +101,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUsername(?string $username): static
     {
         $this->username = $username;
-
         return $this;
     }
 
@@ -93,7 +117,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPasswordHash(string $passwordHash): static
     {
         $this->passwordHash = $passwordHash;
-
         return $this;
     }
 
@@ -113,7 +136,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRole(string $role): static
     {
         $this->role = $role;
-
         return $this;
     }
 
@@ -125,12 +147,69 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedAt(\DateTime $createdAt): static
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
     public function eraseCredentials(): void
     {
         // No temporary sensitive data to clear.
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getMessages(): Collection
+    {
+        return $this->messages;
+    }
+
+    public function addMessage(Message $message): static
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages->add($message);
+            $message->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessage(Message $message): static
+    {
+        if ($this->messages->removeElement($message)) {
+            if ($message->getUser() === $this) {
+                $message->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Subscriber>
+     */
+    public function getSubscribers(): Collection
+    {
+        return $this->subscribers;
+    }
+
+    public function addSubscriber(Subscriber $subscriber): static
+    {
+        if (!$this->subscribers->contains($subscriber)) {
+            $this->subscribers->add($subscriber);
+            $subscriber->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubscriber(Subscriber $subscriber): static
+    {
+        if ($this->subscribers->removeElement($subscriber)) {
+            if ($subscriber->getUser() === $this) {
+                $subscriber->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
