@@ -1,0 +1,150 @@
+{% extends is_granted('ROLE_ADMIN') ? 'admin/base.html.twig' : 'staff/base.html.twig' %}
+
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block title %}Add Vehicle{% endblock %}
+
+{% block page_heading %}Add New Vehicle{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+    <div class="mb-4">
+        <a href="{{ path('vehicle_index') }}" class="btn btn-outline-secondary btn-sm mb-3">
+            &larr; Back to Vehicles
+        </a>
+
+        <h2 class="h4 fw-bold mb-1">Add New Vehicle</h2>
+        <p class="text-muted mb-0">
+            Add a vehicle and upload its image from your computer.
+        </p>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header text-white py-3" style="background: #16324f;">
+            <h5 class="mb-0 fw-semibold">Vehicle Information</h5>
+            <small class="text-white-50">Complete all required fields.</small>
+        </div>
+
+        <div class="card-body p-4">
+
+            {{ form_start(form) }}
+
+            <div class="row g-4">
+
+                <div class="col-md-6">
+                    {{ form_row(form.name) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_row(form.slug) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_row(form.seats) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_row(form.price) }}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_row(form.vehicleClass) }}
+                </div>
+
+                <div class="col-12">
+                    <div class="p-3 rounded-3 border bg-light">
+                        <h6 class="fw-bold mb-2">Vehicle Image</h6>
+                        <p class="small text-muted mb-3">
+                            Choose an image from your computer. JPG, PNG, and WEBP are supported.
+                            Maximum file size is 5 MB.
+                        </p>
+
+                        {{ form_row(form.vehicleImage) }}
+
+                        <div id="imagePreviewContainer" class="mt-3 d-none">
+                            <p class="small fw-semibold mb-2">Image Preview</p>
+                            <div class="bg-white border rounded-3 p-3 text-center">
+                                <img
+                                    id="imagePreview"
+                                    src=""
+                                    alt="Vehicle image preview"
+                                    style="max-width: 100%; max-height: 250px; object-fit: contain;"
+                                >
+                            </div>
+                            <p id="imageFileName" class="small text-muted mt-2 mb-0"></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-primary px-4">
+                    Save Vehicle
+                </button>
+
+                <a href="{{ path('vehicle_index') }}" class="btn btn-outline-secondary px-4">
+                    Cancel
+                </a>
+            </div>
+
+            {{ form_end(form) }}
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const imageInput = document.getElementById('{{ form.vehicleImage.vars.id }}');
+    const previewContainer = document.getElementById('imagePreviewContainer');
+    const preview = document.getElementById('imagePreview');
+    const fileName = document.getElementById('imageFileName');
+
+    if (!imageInput) {
+        return;
+    }
+
+    imageInput.addEventListener('change', function () {
+        const file = this.files[0];
+
+        if (!file) {
+            previewContainer.classList.add('d-none');
+            preview.removeAttribute('src');
+            fileName.textContent = '';
+            return;
+        }
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+        if (!allowedTypes.includes(file.type)) {
+            alert('Please select a JPG, PNG, or WEBP image.');
+            this.value = '';
+            previewContainer.classList.add('d-none');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert('The image must not exceed 5 MB.');
+            this.value = '';
+            previewContainer.classList.add('d-none');
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            preview.src = event.target.result;
+            fileName.textContent = file.name;
+            previewContainer.classList.remove('d-none');
+        };
+
+        reader.readAsDataURL(file);
+    });
+});
+</script>
+{% endblock %}

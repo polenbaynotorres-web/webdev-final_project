@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,10 +36,10 @@
 
             <div class="sidebar-label">MANAGEMENT</div>
 
-            <a href="#" class="sidebar-disabled" aria-disabled="true" title="Coming soon">
+            <a href="{{ path('vehicle_index') }}"
+               class="{{ app.request.attributes.get('_route') starts with 'vehicle_' ? 'active' : '' }}">
                 <span class="sidebar-icon">▣</span>
                 <span>Manage Vehicles</span>
-                <small>Coming soon</small>
             </a>
 
             <a href="#" class="sidebar-disabled" aria-disabled="true" title="Coming soon">

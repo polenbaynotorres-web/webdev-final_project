@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Staff Dashboard{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin.css') }}">
+
+    {% block stylesheets %}{% endblock %}
+</head>
+
+<body class="admin-body">
+
+    <aside class="admin-sidebar">
+
+        <div class="admin-brand">
+            <img src="{{ asset('images/logo-cropped.png') }}" alt="Torres Logo">
+        </div>
+
+        <div class="sidebar-label">STAFF MENU</div>
+
+        <nav class="sidebar-nav">
+
+            <a href="{{ path('staff_dashboard') }}"
+               class="{{ app.request.attributes.get('_route') == 'staff_dashboard' ? 'active' : '' }}">
+                <span class="sidebar-icon">▦</span>
+                <span>Dashboard</span>
+            </a>
+
+            <div class="sidebar-label">MANAGEMENT</div>
+
+            <a href="{{ path('vehicle_index') }}"
+               class="{{ app.request.attributes.get('_route') starts with 'vehicle_' ? 'active' : '' }}">
+                <span class="sidebar-icon">▣</span>
+                <span>Manage Vehicles</span>
+            </a>
+
+            <a href="#" class="sidebar-disabled" aria-disabled="true" title="Coming soon">
+                <span class="sidebar-icon">▤</span>
+                <span>Reservations</span>
+                <small>Coming soon</small>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <a href="/">
+                <span class="sidebar-icon">⌂</span>
+                <span>View Homepage</span>
+            </a>
+
+            <form method="post" action="{{ path('app_logout') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                <button type="submit" class="sidebar-logout">
+                    <span class="sidebar-icon">⇥</span>
+                    <span>Logout</span>
+                </button>
+            </form>
+
+        </div>
+
+    </aside>
+
+    <main class="admin-main">
+
+        <header class="admin-topbar">
+
+            <div class="admin-heading">
+                <h2>{% block page_heading %}Staff Dashboard{% endblock %}</h2>
+                <p>Staff Workspace</p>
+            </div>
+
+            <div class="admin-profile">
+
+                <div class="admin-avatar">
+                    {{ app.user.name|first|upper }}
+                </div>
+
+                <div class="admin-profile-info">
+                    <strong>{{ app.user.name }}</strong>
+                    <span>Staff</span>
+                </div>
+
+            </div>
+
+        </header>
+
+        <section class="admin-content">
+            {% block body %}{% endblock %}
+        </section>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block javascripts %}{% endblock %}
+
+</body>
+</html>
