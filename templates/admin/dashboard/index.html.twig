@@ -1,7 +1,7 @@
 
 {% extends 'admin/base.html.twig' %}
 
-{% block title %}Admin Dashboard | Torres Vehicle Rental{% endblock %}
+{% block title %}Admin Dashboard{% endblock %}
 
 {% block body %}
 <div class="row g-4 mb-4">
@@ -22,7 +22,7 @@
 </div>
 
 <div class="card border-0 shadow-sm p-4">
-    <h5 class="fw-bold">Welcome to Torres Vehicle Rental</h5>
+    <h5 class="fw-bold">Welcome back, {{ app.user.name }}!</h5>
     <p class="text-secondary mb-0">
         Manage your vehicles, reservations, customers, and messages
         from one place.

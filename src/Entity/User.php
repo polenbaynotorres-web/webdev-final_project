@@ -13,6 +13,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Table(name: 'users')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    public const ROLE_USER = 'user';
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_STAFF = 'staff';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(options: ['unsigned' => true])]
@@ -32,7 +36,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(
         name: 'role',
-        columnDefinition: "ENUM('user','admin') NOT NULL DEFAULT 'user'"
+        columnDefinition: "ENUM('user','admin','staff') NOT NULL DEFAULT 'user'"
     )]
     private ?string $role = 'user';
 
@@ -74,6 +78,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setName(string $name): static
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -85,6 +90,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(?string $email): static
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -101,6 +107,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUsername(?string $username): static
     {
         $this->username = $username;
+
         return $this;
     }
 
@@ -117,6 +124,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPasswordHash(string $passwordHash): static
     {
         $this->passwordHash = $passwordHash;
+
         return $this;
     }
 
@@ -129,13 +137,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return [
             'ROLE_USER',
-            'ROLE_' . strtoupper($this->role ?? 'user'),
+            'ROLE_' . strtoupper($this->role ?? self::ROLE_USER),
         ];
     }
 
     public function setRole(string $role): static
     {
+        if (!in_array($role, [
+            self::ROLE_USER,
+            self::ROLE_ADMIN,
+            self::ROLE_STAFF,
+        ], true)) {
+            throw new \InvalidArgumentException('Invalid user role.');
+        }
+
         $this->role = $role;
+
         return $this;
     }
 
@@ -147,6 +164,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedAt(\DateTime $createdAt): static
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 

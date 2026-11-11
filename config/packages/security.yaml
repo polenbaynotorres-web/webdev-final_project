@@ -2,6 +2,10 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_STAFF
+        ROLE_STAFF: ROLE_USER
+
     providers:
         app_user_provider:
             id: App\Security\UserProvider
@@ -28,8 +32,20 @@ security:
                 target: app_login
 
     access_control:
+        # Allow everyone to access the login page.
+        - { path: ^/login$, roles: PUBLIC_ACCESS }
+
+        # Admin dashboard.
         - { path: ^/dashboard, roles: ROLE_ADMIN }
+
+        # Staff dashboard.
+        - { path: ^/staff, roles: ROLE_STAFF }
+
+        # User dashboard.
         - { path: ^/user, roles: ROLE_USER }
+
+        # Require authentication for all other application routes.
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
