@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% block title %}Admin Dashboard{% endblock %}</title>
+    <title>{% block title %}Admin Dashboard{% endblock %} | Torres Vehicle Rental</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,8 @@
 
 <body class="admin-body">
 
-    <aside class="admin-sidebar">
+    <!-- ADMIN SIDEBAR -->
+    <aside class="admin-sidebar" id="adminSidebar">
 
         <div class="admin-brand">
             <img src="{{ asset('images/logo-cropped.png') }}" alt="Torres Logo">
@@ -38,7 +39,7 @@
 
             <a href="{{ path('vehicle_index') }}"
                class="{{ app.request.attributes.get('_route') starts with 'vehicle_' ? 'active' : '' }}">
-                <span class="sidebar-icon">▣</span>
+                <span class="sidebar-icon">🚗</span>
                 <span>Manage Vehicles</span>
             </a>
 
@@ -92,15 +93,35 @@
 
     </aside>
 
+    <!-- MOBILE BACKDROP -->
+    <div class="admin-sidebar-backdrop" id="adminSidebarBackdrop"></div>
+
+    <!-- MAIN CONTENT -->
     <main class="admin-main">
 
+        <!-- ADMIN HEADER -->
         <header class="admin-topbar">
 
-            <div class="admin-heading">
-                <h2>{% block page_heading %}Dashboard{% endblock %}</h2>
-                <p>Administration Overview</p>
+            <div class="admin-header-left">
+
+                <button type="button"
+                        class="admin-sidebar-toggle"
+                        id="adminSidebarToggle"
+                        aria-label="Toggle sidebar"
+                        aria-controls="adminSidebar"
+                        aria-expanded="true">
+                    ☰
+                </button>
+
+                <div class="admin-heading">
+                    <span class="admin-header-label">TORRES VEHICLE RENTAL</span>
+                    <h2>{% block page_heading %}Dashboard{% endblock %}</h2>
+                    <p>Administration Overview</p>
+                </div>
+
             </div>
 
+            <!-- ADMIN PROFILE -->
             <div class="admin-profile">
 
                 <div class="admin-avatar">
@@ -116,11 +137,88 @@
 
         </header>
 
+        <!-- PAGE CONTENT -->
         <section class="admin-content">
             {% block body %}{% endblock %}
         </section>
 
+        <!-- ADMIN FOOTER -->
+        <footer class="admin-footer">
+            <p>
+                &copy; {{ "now"|date("Y") }} Torres Vehicle Rental.
+                All rights reserved.
+            </p>
+
+            <span>Administration Panel</span>
+        </footer>
+
     </main>
+
+    <!-- SIDEBAR TOGGLE SCRIPT -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const body = document.body;
+            const toggle = document.getElementById('adminSidebarToggle');
+            const backdrop = document.getElementById('adminSidebarBackdrop');
+            const sidebar = document.getElementById('adminSidebar');
+
+            const mobileScreen = window.matchMedia('(max-width: 760px)');
+
+            if (!toggle || !backdrop || !sidebar) {
+                return;
+            }
+
+            function updateButton() {
+                const isOpen = mobileScreen.matches
+                    ? body.classList.contains('sidebar-open')
+                    : !body.classList.contains('sidebar-collapsed');
+
+                toggle.setAttribute('aria-expanded', String(isOpen));
+
+                toggle.setAttribute(
+                    'aria-label',
+                    isOpen ? 'Collapse sidebar' : 'Expand sidebar'
+                );
+            }
+
+            // Toggle sidebar
+            toggle.addEventListener('click', function () {
+
+                if (mobileScreen.matches) {
+                    body.classList.toggle('sidebar-open');
+                } else {
+                    body.classList.toggle('sidebar-collapsed');
+                }
+
+                updateButton();
+            });
+
+            // Close sidebar when clicking outside on mobile
+            backdrop.addEventListener('click', function () {
+                body.classList.remove('sidebar-open');
+                updateButton();
+            });
+
+            // Close sidebar using Escape key
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    body.classList.remove('sidebar-open');
+                    updateButton();
+                }
+            });
+
+            // Reset sidebar state when screen size changes
+            mobileScreen.addEventListener('change', function () {
+                body.classList.remove('sidebar-open');
+                body.classList.remove('sidebar-collapsed');
+                updateButton();
+            });
+
+            updateButton();
+
+        });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 

@@ -1,31 +1,110 @@
-
 {% extends 'admin/base.html.twig' %}
 
 {% block title %}Admin Dashboard{% endblock %}
 
+{% block page_heading %}Dashboard{% endblock %}
+
 {% block body %}
-<div class="row g-4 mb-4">
-    {% for item in [
-        {label: 'Total Vehicles', description: 'Vehicle records will appear here'},
-        {label: 'Reservations', description: 'Reservation records will appear here'},
-        {label: 'Customers', description: 'Customer records will appear here'},
-        {label: 'Messages', description: 'Contact messages will appear here'}
-    ] %}
+
+<div class="container-fluid p-0">
+
+    <!-- DASHBOARD INTRODUCTION -->
+    <div class="mb-4">
+        <h4 class="fw-bold mb-1">Dashboard Overview</h4>
+        <p class="text-secondary mb-0">
+            Monitor your vehicle rental system and manage its operations.
+        </p>
+    </div>
+
+    <!-- STATISTICS CARDS -->
+    <div class="row g-4 mb-4">
+
+        <!-- TOTAL VEHICLES -->
         <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm p-3">
-                <div class="text-secondary">{{ item.label }}</div>
-                <h2 class="fw-bold mt-2">—</h2>
-                <small>{{ item.description }}</small>
+            <div class="card border-0 shadow-sm p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-secondary fw-semibold">Total Vehicles</span>
+                    <span class="fs-3">🚗</span>
+                </div>
+
+                <h2 class="fw-bold mt-3 mb-1">
+                    {{ totalVehicles|number_format(0, '.', ',') }}
+                </h2>
+
+                <small class="text-secondary">
+                    Registered vehicles in the system
+                </small>
             </div>
         </div>
-    {% endfor %}
+
+        <!-- TOTAL RESERVATIONS -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-secondary fw-semibold">Reservations</span>
+                    <span class="fs-3">📋</span>
+                </div>
+
+                <h2 class="fw-bold mt-3 mb-1">
+                    {{ totalReservations|number_format(0, '.', ',') }}
+                </h2>
+
+                <small class="text-secondary">
+                    Total reservation records
+                </small>
+            </div>
+        </div>
+
+        <!-- TOTAL CUSTOMERS -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-secondary fw-semibold">Customers</span>
+                    <span class="fs-3">👥</span>
+                </div>
+
+                <h2 class="fw-bold mt-3 mb-1">
+                    {{ totalCustomers|number_format(0, '.', ',') }}
+                </h2>
+
+                <small class="text-secondary">
+                    Registered customer accounts
+                </small>
+            </div>
+        </div>
+
+        <!-- TOTAL MESSAGES -->
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-secondary fw-semibold">Messages</span>
+                    <span class="fs-3">✉️</span>
+                </div>
+
+                <h2 class="fw-bold mt-3 mb-1">
+                    {{ totalMessages|number_format(0, '.', ',') }}
+                </h2>
+
+                <small class="text-secondary">
+                    Contact messages received
+                </small>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- WELCOME SECTION -->
+    <div class="card border-0 shadow-sm p-4">
+        <h5 class="fw-bold mb-2">
+            Welcome back, {{ app.user.name }}!
+        </h5>
+
+        <p class="text-secondary mb-0">
+            Manage your vehicles, reservations, customers, and messages
+            from your Administration Dashboard.
+        </p>
+    </div>
+
 </div>
 
-<div class="card border-0 shadow-sm p-4">
-    <h5 class="fw-bold">Welcome back, {{ app.user.name }}!</h5>
-    <p class="text-secondary mb-0">
-        Manage your vehicles, reservations, customers, and messages
-        from one place.
-    </p>
-</div>
 {% endblock %}
