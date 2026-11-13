@@ -1,0 +1,101 @@
+
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Messages{% endblock %}
+{% block page_heading %}Messages{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-0">
+
+    <div class="mb-4">
+        <h3>Customer Messages</h3>
+        <p class="text-muted mb-0">
+            Messages sent through the contact form.
+        </p>
+    </div>
+
+    {% include '_partials/flashes.html.twig' %}
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Date</th>
+                            <th>From</th>
+                            <th>Subject</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for message in messages %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+
+                            <td class="text-nowrap">
+                                {{ message.createdAt|date('M d, Y h:i A') }}
+                            </td>
+
+                            <td>
+                                {{ message.name }}
+                                <div class="small text-muted">
+                                    {{ message.email }}
+                                </div>
+                            </td>
+
+                            <td>{{ message.subject }}</td>
+
+                            <td class="text-end text-nowrap">
+
+                                <a
+                                    href="{{ path('admin_message_show', {id: message.id}) }}"
+                                    class="btn btn-sm btn-outline-primary"
+                                >
+                                    View
+                                </a>
+
+                                <form
+                                    method="post"
+                                    action="{{ path('admin_message_delete', {id: message.id}) }}"
+                                    class="d-inline"
+                                    onsubmit="return confirm('Delete this message?');"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="_token"
+                                        value="{{ csrf_token('message_delete_' ~ message.id) }}"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm btn-outline-danger"
+                                    >
+                                        Delete
+                                    </button>
+                                </form>
+
+                            </td>
+                        </tr>
+
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                No messages yet.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

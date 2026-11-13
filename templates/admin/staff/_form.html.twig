@@ -1,0 +1,57 @@
+{% if errors is not empty %}
+    <div class="alert alert-danger">
+        <strong>Please correct the following:</strong>
+        <ul class="mb-0 mt-2">
+            {% for error in errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <form method="post" action="{{ formAction }}">
+            <input type="hidden" name="_token" value="{{ csrf_token(csrfTokenId) }}">
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" id="name" name="name" class="form-control"
+                       value="{{ staff.name ?? '' }}" maxlength="120" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" id="username" name="username" class="form-control"
+                       value="{{ staff.username ?? '' }}" maxlength="60" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control"
+                       value="{{ staff.email ?? '' }}" maxlength="190" required>
+            </div>
+
+            <div class="mb-4">
+                <label for="password" class="form-label">
+                    {{ isEdit ? 'New Password (optional)' : 'Temporary Password' }}
+                </label>
+                <input type="password" id="password" name="password" class="form-control"
+                       minlength="8" {{ isEdit ? '' : 'required' }}
+                       autocomplete="new-password">
+                {% if isEdit %}
+                    <div class="form-text">Leave blank to keep the current password.</div>
+                {% else %}
+                    <div class="form-text">Minimum 8 characters.</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                {{ isEdit ? 'Save Changes' : 'Create Staff Account' }}
+            </button>
+            <a href="{{ path('admin_staff_index') }}" class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        </form>
+    </div>
+</div>

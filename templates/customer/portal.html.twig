@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %}Customer Portal{% endblock %} | Torres Vehicle Rental</title>
+
+    <link rel="icon" href="{{ asset('images/logo-icon.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/css/customer-portal.css') }}">
+
+    {% block stylesheets %}{% endblock %}
+</head>
+
+<body class="customer-portal-body">
+
+{% set currentRoute = app.request.attributes.get('_route')|default('') %}
+
+<div class="customer-portal" id="customerPortal">
+
+    <aside class="customer-sidebar" id="customerSidebar" aria-label="Main navigation">
+
+        <a class="customer-brand" href="{{ path('app_home') }}">
+            <img src="{{ asset('images/logo-cropped.png') }}" alt="Torres Vehicle Rental">
+        </a>
+
+        <div class="customer-sidebar-caption">
+            {{ app.user ? 'ACCOUNT MENU' : 'PUBLIC MENU' }}
+        </div>
+
+        <nav class="customer-sidebar-nav">
+
+            {% if app.user %}
+
+                {% if is_granted('ROLE_ADMIN') %}
+
+                    <a href="{{ path('admin_dashboard') }}"
+                       class="{{ currentRoute starts with 'admin_' ? 'active' : '' }}">
+                        <span class="customer-nav-icon">⌂</span>
+                        <span>Admin Dashboard</span>
+                    </a>
+
+                {% elseif is_granted('ROLE_STAFF') %}
+
+                    <a href="{{ path('staff_dashboard') }}"
+                       class="{{ currentRoute starts with 'staff_' ? 'active' : '' }}">
+                        <span class="customer-nav-icon">⌂</span>
+                        <span>Staff Dashboard</span>
+                    </a>
+
+                {% else %}
+
+                    <a href="{{ path('user_dashboard') }}"
+                       class="{{ currentRoute == 'user_dashboard' ? 'active' : '' }}">
+                        <span class="customer-nav-icon">⌂</span>
+                        <span>Dashboard</span>
+                    </a>
+
+                {% endif %}
+
+            {% else %}
+
+                <a href="{{ path('app_home') }}"
+                   class="{{ currentRoute == 'app_home' ? 'active' : '' }}">
+                    <span class="customer-nav-icon">⌂</span>
+                    <span>Home</span>
+                </a>
+
+            {% endif %}
+
+            <a href="{{ path('fleet_index') }}"
+               class="{{ currentRoute starts with 'fleet_' or currentRoute in ['vehicle_details', 'user_vehicle_book'] ? 'active' : '' }}">
+                <span class="customer-nav-icon">🚘</span>
+                <span>Browse Vehicles</span>
+            </a>
+
+            <a href="{{ path('contact') }}"
+               class="{{ currentRoute == 'contact' ? 'active' : '' }}">
+                <span class="customer-nav-icon">✉</span>
+                <span>Contact Us</span>
+            </a>
+
+            {% if app.user and not is_granted('ROLE_ADMIN') and not is_granted('ROLE_STAFF') %}
+
+                <a href="{{ path('user_reservation_index') }}"
+                   class="{{ currentRoute starts with 'user_reservation_' or currentRoute starts with 'user_return_' ? 'active' : '' }}">
+                    <span class="customer-nav-icon">▤</span>
+                    <span>My Reservations</span>
+                </a>
+
+                <a href="{{ path('account_profile') }}"
+                   class="{{ currentRoute in ['account_profile', 'account_password', 'user_profile'] ? 'active' : '' }}">
+                    <span class="customer-nav-icon">♙</span>
+                    <span>My Profile</span>
+                </a>
+
+                <a href="{{ path('account_password') }}"
+                   class="{{ currentRoute == 'account_password' ? 'active' : '' }}">
+                    <span class="customer-nav-icon">⚿</span>
+                    <span>Change Password</span>
+                </a>
+
+            {% endif %}
+
+        </nav>
+
+        <div class="customer-sidebar-bottom">
+
+            <a href="{{ path('app_home') }}">
+                <span class="customer-nav-icon">⌂</span>
+                <span>View Homepage</span>
+            </a>
+
+            {% if app.user %}
+
+                <form method="post" action="{{ path('app_logout') }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                    <button type="submit">
+                        <span class="customer-nav-icon">⇥</span>
+                        <span>Logout</span>
+                    </button>
+                </form>
+
+            {% else %}
+
+                <a href="{{ path('app_login') }}">
+                    <span class="customer-nav-icon">⇥</span>
+                    <span>Login</span>
+                </a>
+
+                <a href="{{ path('app_register') }}">
+                    <span class="customer-nav-icon">＋</span>
+                    <span>Create Account</span>
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </aside>
+
+    <button
+        class="customer-sidebar-backdrop"
+        id="customerSidebarBackdrop"
+        type="button"
+        aria-label="Close navigation">
+    </button>
+
+    <main class="customer-main">
+
+        <header class="customer-topbar">
+
+            <div class="d-flex align-items-center gap-3 min-w-0">
+
+                <button
+                    class="customer-sidebar-toggle"
+                    id="customerSidebarToggle"
+                    type="button"
+                    aria-label="Open navigation"
+                    aria-controls="customerSidebar"
+                    aria-expanded="false">
+                    ☰
+                </button>
+
+                <div class="min-w-0">
+                    <div class="customer-eyebrow">
+                        {% block portal_eyebrow %}CUSTOMER PORTAL{% endblock %}
+                    </div>
+
+                    <div class="customer-page-heading">
+                        {% block page_heading %}Dashboard{% endblock %}
+                    </div>
+
+                    <div class="customer-page-description">
+                        {% block page_description %}Manage your rentals and account.{% endblock %}
+                    </div>
+                </div>
+
+            </div>
+
+            {% if app.user %}
+
+                <div class="customer-user-chip">
+                    <span class="customer-avatar">
+                        {{ app.user.name|default('U')|first|upper }}
+                    </span>
+                    <span>{{ app.user.name|default('User') }}</span>
+                </div>
+
+            {% else %}
+
+                <div class="customer-user-chip">
+                    <a href="{{ path('app_login') }}" class="btn btn-outline-primary btn-sm">
+                        Login
+                    </a>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary btn-sm">
+                        Register
+                    </a>
+                </div>
+
+            {% endif %}
+
+        </header>
+
+        <section class="customer-content">
+
+            {% include '_partials/flashes.html.twig' %}
+
+            {% block body %}{% endblock %}
+
+        </section>
+
+        <footer class="customer-footer">
+            &copy; {{ 'now'|date('Y') }} Torres Vehicle Rental. All rights reserved.
+        </footer>
+
+    </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+(() => {
+    const layout = document.getElementById('customerPortal');
+    const toggle = document.getElementById('customerSidebarToggle');
+    const backdrop = document.getElementById('customerSidebarBackdrop');
+
+    if (!layout || !toggle || !backdrop) return;
+
+    const mobile = window.matchMedia('(max-width: 800px)');
+
+    const closeMobile = () => {
+        layout.classList.remove('sidebar-open');
+    };
+
+    const sync = () => {
+        const expanded = mobile.matches
+            ? layout.classList.contains('sidebar-open')
+            : !layout.classList.contains('sidebar-collapsed');
+
+        toggle.setAttribute('aria-expanded', String(expanded));
+        toggle.setAttribute(
+            'aria-label',
+            expanded ? 'Close navigation' : 'Open navigation'
+        );
+    };
+
+    toggle.addEventListener('click', () => {
+        if (mobile.matches) {
+            layout.classList.toggle('sidebar-open');
+        } else {
+            layout.classList.toggle('sidebar-collapsed');
+        }
+
+        sync();
+    });
+
+    backdrop.addEventListener('click', () => {
+        closeMobile();
+        sync();
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            closeMobile();
+            sync();
+        }
+    });
+
+    mobile.addEventListener('change', () => {
+        closeMobile();
+        layout.classList.remove('sidebar-collapsed');
+        sync();
+    });
+
+    layout.querySelectorAll('.customer-sidebar-nav a, .customer-sidebar-bottom a')
+        .forEach(link => {
+            link.addEventListener('click', closeMobile);
+        });
+
+    sync();
+})();
+</script>
+
+{% block javascripts %}{% endblock %}
+
+</body>
+</html>

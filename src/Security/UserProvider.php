@@ -44,6 +44,14 @@ class UserProvider implements UserProviderInterface
             throw new UserNotFoundException('Account no longer exists.');
         }
 
+        if ($refreshedUser->isDeleted()) {
+            throw new UserNotFoundException('This account has been deleted.');
+        }
+
+        if (!$refreshedUser->isActive()) {
+            throw new UserNotFoundException('This account has been disabled.');
+        }
+
         return $refreshedUser;
     }
 

@@ -72,9 +72,9 @@ class Reservation
 
     #[ORM\Column(
         type: Types::STRING,
-        columnDefinition: "ENUM('confirmed','cancelled') DEFAULT 'confirmed'"
+        columnDefinition: "ENUM('pending','confirmed','cancelled','completed') NOT NULL DEFAULT 'pending'"
     )]
-    private ?string $status = 'confirmed';
+    private ?string $status = 'pending';
 
     #[ORM\Column(
         name: 'created_at',
@@ -88,7 +88,7 @@ class Reservation
 
     public function __construct()
     {
-        $this->status = 'confirmed';
+        $this->status = 'pending';
         $this->createdAt = new \DateTime();
     }
 

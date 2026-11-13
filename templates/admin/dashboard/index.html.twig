@@ -1,110 +1,187 @@
+
 {% extends 'admin/base.html.twig' %}
 
 {% block title %}Admin Dashboard{% endblock %}
-
 {% block page_heading %}Dashboard{% endblock %}
 
 {% block body %}
 
-<div class="container-fluid p-0">
+<div class="mb-4">
+    <h4 class="fw-bold mb-1">Dashboard Overview</h4>
+    <p class="text-secondary mb-0">
+        Monitor the rental business and access all administration tools.
+    </p>
+</div>
 
-    <!-- DASHBOARD INTRODUCTION -->
-    <div class="mb-4">
-        <h4 class="fw-bold mb-1">Dashboard Overview</h4>
-        <p class="text-secondary mb-0">
-            Monitor your vehicle rental system and manage its operations.
-        </p>
+<div class="row g-3 mb-4">
+
+    {% set cards = [
+        {'label':'Vehicles','value':totalVehicles,'icon':'🚗','link':'vehicle_index','hint':'Registered fleet'},
+        {'label':'Reservations','value':totalReservations,'icon':'📋','link':'reservation_index','hint':'All booking records'},
+        {'label':'Pending Reservations','value':pendingReservations,'icon':'⏳','link':'reservation_index','hint':'Awaiting Admin or Staff approval'},
+        {'label':'Confirmed Rentals','value':activeReservations,'icon':'🗓️','link':'reservation_index','hint':'Approved reservations'},
+        {'label':'Customers','value':totalCustomers,'icon':'👥','link':'admin_customer_index','hint':'Customer accounts'},
+        {'label':'Staff','value':totalStaff,'icon':'🧑‍💼','link':'admin_staff_index','hint':'Staff accounts'},
+        {'label':'Messages','value':totalMessages,'icon':'✉️','link':'admin_message_index','hint':'Contact inquiries'},
+        {'label':'Locations','value':totalLocations,'icon':'📍','link':'admin_location_index','hint':'Pickup / return points'},
+        {'label':'Returns to Review','value':pendingReturns,'icon':'↩️','link':'manage_return_index','hint':'Pending inspection / confirmation'}
+    ] %}
+
+    {% for card in cards %}
+        <div class="col-6 col-xl-3">
+            <a href="{{ path(card.link) }}" class="text-decoration-none text-reset">
+                <div class="card border-0 shadow-sm p-3 h-100">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-secondary fw-semibold">
+                            {{ card.label }}
+                        </span>
+                        <span class="fs-3">{{ card.icon }}</span>
+                    </div>
+
+                    <div class="fs-2 fw-bold mt-2">
+                        {{ card.value|number_format }}
+                    </div>
+
+                    <small class="text-secondary">
+                        {{ card.hint }}
+                    </small>
+                </div>
+            </a>
+        </div>
+    {% endfor %}
+
+</div>
+
+<div class="row g-3">
+
+    {# RECENT RESERVATIONS #}
+    <div class="col-xl-8">
+        <div class="card border-0 shadow-sm">
+
+            <div class="d-flex justify-content-between align-items-center p-3">
+                <h5 class="fw-bold mb-0">Recent Reservations</h5>
+
+                <a href="{{ path('reservation_index') }}" class="small">
+                    View all
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>No.</th>
+                            <th>Customer</th>
+                            <th>Vehicle</th>
+                            <th>Pickup</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for r in recentReservations %}
+                        <tr>
+                            <td>
+                                <a href="{{ path('reservation_show', {id: r.id}) }}">
+                                    {{ loop.index }}
+                                </a>
+                            </td>
+
+                            <td>{{ r.customer_name }}</td>
+
+                            <td>{{ r.vehicle_name }}</td>
+
+                            <td>{{ r.pickup_date|date('M d, Y') }}</td>
+
+                            <td>
+                                <span class="badge text-bg-light">
+                                    {{ r.status|title }}
+                                </span>
+                            </td>
+                        </tr>
+
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-secondary py-4">
+                                No reservations yet.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
     </div>
 
-    <!-- STATISTICS CARDS -->
-    <div class="row g-4 mb-4">
+    {# LATEST MESSAGES #}
+    <div class="col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
 
-        <!-- TOTAL VEHICLES -->
-        <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm p-3 h-100">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-secondary fw-semibold">Total Vehicles</span>
-                    <span class="fs-3">🚗</span>
-                </div>
+            <div class="d-flex justify-content-between align-items-center p-3">
+                <h5 class="fw-bold mb-0">Latest Messages</h5>
 
-                <h2 class="fw-bold mt-3 mb-1">
-                    {{ totalVehicles|number_format(0, '.', ',') }}
-                </h2>
+                <a href="{{ path('admin_message_index') }}" class="small">
+                    View all
+                </a>
+            </div>
 
-                <small class="text-secondary">
-                    Registered vehicles in the system
-                </small>
+            <div class="list-group list-group-flush">
+
+                {% for m in recentMessages %}
+                    <a
+                        class="list-group-item list-group-item-action px-3"
+                        href="{{ path('admin_message_show', {id: m.id}) }}"
+                    >
+                        <strong class="d-block">
+                            {{ m.subject }}
+                        </strong>
+
+                        <span class="small text-secondary">
+                            {{ m.name }} · {{ m.created_at|date('M d') }}
+                        </span>
+                    </a>
+
+                {% else %}
+                    <div class="p-3 text-secondary">
+                        No messages received.
+                    </div>
+                {% endfor %}
+
             </div>
         </div>
-
-        <!-- TOTAL RESERVATIONS -->
-        <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm p-3 h-100">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-secondary fw-semibold">Reservations</span>
-                    <span class="fs-3">📋</span>
-                </div>
-
-                <h2 class="fw-bold mt-3 mb-1">
-                    {{ totalReservations|number_format(0, '.', ',') }}
-                </h2>
-
-                <small class="text-secondary">
-                    Total reservation records
-                </small>
-            </div>
-        </div>
-
-        <!-- TOTAL CUSTOMERS -->
-        <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm p-3 h-100">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-secondary fw-semibold">Customers</span>
-                    <span class="fs-3">👥</span>
-                </div>
-
-                <h2 class="fw-bold mt-3 mb-1">
-                    {{ totalCustomers|number_format(0, '.', ',') }}
-                </h2>
-
-                <small class="text-secondary">
-                    Registered customer accounts
-                </small>
-            </div>
-        </div>
-
-        <!-- TOTAL MESSAGES -->
-        <div class="col-md-6 col-xl-3">
-            <div class="card border-0 shadow-sm p-3 h-100">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-secondary fw-semibold">Messages</span>
-                    <span class="fs-3">✉️</span>
-                </div>
-
-                <h2 class="fw-bold mt-3 mb-1">
-                    {{ totalMessages|number_format(0, '.', ',') }}
-                </h2>
-
-                <small class="text-secondary">
-                    Contact messages received
-                </small>
-            </div>
-        </div>
-
     </div>
 
-    <!-- WELCOME SECTION -->
-    <div class="card border-0 shadow-sm p-4">
-        <h5 class="fw-bold mb-2">
-            Welcome back, {{ app.user.name }}!
-        </h5>
+</div>
 
-        <p class="text-secondary mb-0">
-            Manage your vehicles, reservations, customers, and messages
-            from your Administration Dashboard.
-        </p>
+{# QUICK ACTIONS #}
+<div class="mt-4">
+    <div class="card border-0 shadow-sm p-3">
+
+        <h5 class="fw-bold">Quick Actions</h5>
+
+        <div class="d-flex flex-wrap gap-2">
+
+            <a class="btn btn-dark" href="{{ path('vehicle_new') }}">
+                Add Vehicle
+            </a>
+
+            <a class="btn btn-outline-dark" href="{{ path('admin_staff_new') }}">
+                Create Staff Account
+            </a>
+
+            <a class="btn btn-outline-dark" href="{{ path('admin_location_index') }}">
+                Add Location
+            </a>
+
+            <a class="btn btn-outline-dark" href="{{ path('manage_return_index') }}">
+                Review Vehicle Returns
+            </a>
+
+        </div>
     </div>
-
 </div>
 
 {% endblock %}

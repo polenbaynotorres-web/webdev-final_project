@@ -551,6 +551,10 @@
             {# LOGIN FORM #}
             <section id="loginPanel">
 
+                {% for message in app.flashes('success') %}
+                    <div class="auth-success">{{ message }}</div>
+                {% endfor %}
+
                 {% if error %}
                     <div class="auth-error">
                         {{ error.messageKey|trans(error.messageData, 'security') }}
@@ -734,11 +738,11 @@
     });
 
     registerTab.addEventListener('click', function () {
-        setMode('register');
+        window.location.href = "{{ path('app_register') }}";
     });
 
     showRegister.addEventListener('click', function () {
-        setMode('register');
+        window.location.href = "{{ path('app_register') }}";
     });
 </script>
 

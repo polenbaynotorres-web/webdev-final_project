@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,73 +19,80 @@
 
 <body class="admin-body">
 
-    <!-- ADMIN SIDEBAR -->
     <aside class="admin-sidebar" id="adminSidebar">
 
         <div class="admin-brand">
             <img src="{{ asset('images/logo-cropped.png') }}" alt="Torres Logo">
         </div>
 
-        <div class="sidebar-label">MAIN MENU</div>
+        <div class="sidebar-label">ADMIN MENU</div>
 
         <nav class="sidebar-nav">
 
             <a href="{{ path('admin_dashboard') }}"
                class="{{ app.request.attributes.get('_route') == 'admin_dashboard' ? 'active' : '' }}">
-                <span class="sidebar-icon">▦</span>
+                <span class="sidebar-icon">&#9638;</span>
                 <span>Dashboard</span>
             </a>
 
             <div class="sidebar-label">MANAGEMENT</div>
 
             <a href="{{ path('vehicle_index') }}"
-               class="{{ app.request.attributes.get('_route') starts with 'vehicle_' ? 'active' : '' }}">
-                <span class="sidebar-icon">🚗</span>
+               class="{{ app.request.attributes.get('_route') starts with 'vehicle_' or app.request.attributes.get('_route') starts with 'vehicle_color_' ? 'active' : '' }}">
+                <span class="sidebar-icon">&#128663;</span>
                 <span>Manage Vehicles</span>
             </a>
 
-            <a href="#" class="sidebar-disabled" aria-disabled="true" title="Coming soon">
-                <span class="sidebar-icon">▤</span>
+            <a href="{{ path('reservation_index') }}"
+               class="{{ app.request.attributes.get('_route') starts with 'reservation_' ? 'active' : '' }}">
+                <span class="sidebar-icon">&#9636;</span>
                 <span>Reservations</span>
-                <small>Coming soon</small>
             </a>
 
-            <a href="#" class="sidebar-disabled" aria-disabled="true" title="Coming soon">
-                <span class="sidebar-icon">♙</span>
+            <a href="{{ path('admin_customer_index') }}"
+               class="{{ app.request.attributes.get('_route') starts with 'admin_customer_' ? 'active' : '' }}">
+                <span class="sidebar-icon">&#9817;</span>
                 <span>Customers</span>
-                <small>Coming soon</small>
             </a>
 
-            <a href="#" class="sidebar-disabled" aria-disabled="true" title="Coming soon">
-                <span class="sidebar-icon">✉</span>
+            <a href="{{ path('admin_staff_index') }}"
+               class="{{ app.request.attributes.get('_route') starts with 'admin_staff_' ? 'active' : '' }}">
+                <span class="sidebar-icon">&#128101;</span>
+                <span>Staff Accounts</span>
+            </a>
+
+            <a href="{{ path('admin_message_index') }}"
+               class="{{ app.request.attributes.get('_route') starts with 'admin_message_' ? 'active' : '' }}">
+                <span class="sidebar-icon">&#9993;</span>
                 <span>Messages</span>
-                <small>Coming soon</small>
             </a>
 
-            <a href="#" class="sidebar-disabled" aria-disabled="true" title="Coming soon">
-                <span class="sidebar-icon">⌖</span>
+            <a href="{{ path('admin_location_index') }}"
+               class="{{ app.request.attributes.get('_route') starts with 'admin_location_' ? 'active' : '' }}">
+                <span class="sidebar-icon">&#128205;</span>
                 <span>Locations</span>
-                <small>Coming soon</small>
+            </a>
+
+            <a href="{{ path('manage_return_index') }}"
+               class="{{ app.request.attributes.get('_route') starts with 'manage_return_' ? 'active' : '' }}">
+                <span class="sidebar-icon">&#8635;</span>
+                <span>Vehicle Returns</span>
             </a>
 
         </nav>
 
         <div class="sidebar-bottom">
 
-            <a href="{{ path('user_dashboard') }}">
-                <span class="sidebar-icon">↗</span>
-                <span>View User Dashboard</span>
-            </a>
-
             <a href="/">
-                <span class="sidebar-icon">⌂</span>
+                <span class="sidebar-icon">&#x2302;</span>
                 <span>View Homepage</span>
             </a>
 
             <form method="post" action="{{ path('app_logout') }}">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+
                 <button type="submit" class="sidebar-logout">
-                    <span class="sidebar-icon">⇥</span>
+                    <span class="sidebar-icon">&#x21E5;</span>
                     <span>Logout</span>
                 </button>
             </form>
@@ -93,13 +101,10 @@
 
     </aside>
 
-    <!-- MOBILE BACKDROP -->
     <div class="admin-sidebar-backdrop" id="adminSidebarBackdrop"></div>
 
-    <!-- MAIN CONTENT -->
     <main class="admin-main">
 
-        <!-- ADMIN HEADER -->
         <header class="admin-topbar">
 
             <div class="admin-header-left">
@@ -107,21 +112,20 @@
                 <button type="button"
                         class="admin-sidebar-toggle"
                         id="adminSidebarToggle"
-                        aria-label="Toggle sidebar"
+                        aria-label="Collapse sidebar"
                         aria-controls="adminSidebar"
                         aria-expanded="true">
-                    ☰
+                    &#x2630;
                 </button>
 
                 <div class="admin-heading">
                     <span class="admin-header-label">TORRES VEHICLE RENTAL</span>
-                    <h2>{% block page_heading %}Dashboard{% endblock %}</h2>
-                    <p>Administration Overview</p>
+                    <h2>{% block page_heading %}Admin Dashboard{% endblock %}</h2>
+                    <p>Admin Workspace</p>
                 </div>
 
             </div>
 
-            <!-- ADMIN PROFILE -->
             <div class="admin-profile">
 
                 <div class="admin-avatar">
@@ -137,35 +141,30 @@
 
         </header>
 
-        <!-- PAGE CONTENT -->
         <section class="admin-content">
             {% block body %}{% endblock %}
         </section>
 
-        <!-- ADMIN FOOTER -->
         <footer class="admin-footer">
             <p>
-                &copy; {{ "now"|date("Y") }} Torres Vehicle Rental.
+                &copy; {{ "now"|date("Y") }}
+                Torres Vehicle Rental.
                 All rights reserved.
             </p>
 
-            <span>Administration Panel</span>
+            <span>Admin Workspace</span>
         </footer>
 
     </main>
 
-    <!-- SIDEBAR TOGGLE SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-
             const body = document.body;
             const toggle = document.getElementById('adminSidebarToggle');
             const backdrop = document.getElementById('adminSidebarBackdrop');
-            const sidebar = document.getElementById('adminSidebar');
-
             const mobileScreen = window.matchMedia('(max-width: 760px)');
 
-            if (!toggle || !backdrop || !sidebar) {
+            if (!toggle || !backdrop) {
                 return;
             }
 
@@ -175,16 +174,13 @@
                     : !body.classList.contains('sidebar-collapsed');
 
                 toggle.setAttribute('aria-expanded', String(isOpen));
-
                 toggle.setAttribute(
                     'aria-label',
                     isOpen ? 'Collapse sidebar' : 'Expand sidebar'
                 );
             }
 
-            // Toggle sidebar
             toggle.addEventListener('click', function () {
-
                 if (mobileScreen.matches) {
                     body.classList.toggle('sidebar-open');
                 } else {
@@ -194,13 +190,11 @@
                 updateButton();
             });
 
-            // Close sidebar when clicking outside on mobile
             backdrop.addEventListener('click', function () {
                 body.classList.remove('sidebar-open');
                 updateButton();
             });
 
-            // Close sidebar using Escape key
             document.addEventListener('keydown', function (event) {
                 if (event.key === 'Escape') {
                     body.classList.remove('sidebar-open');
@@ -208,7 +202,6 @@
                 }
             });
 
-            // Reset sidebar state when screen size changes
             mobileScreen.addEventListener('change', function () {
                 body.classList.remove('sidebar-open');
                 body.classList.remove('sidebar-collapsed');
@@ -216,7 +209,6 @@
             });
 
             updateButton();
-
         });
     </script>
 

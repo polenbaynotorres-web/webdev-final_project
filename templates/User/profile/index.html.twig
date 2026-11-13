@@ -1,0 +1,22 @@
+{% extends 'customer/portal.html.twig' %}
+{% block title %}My Profile{% endblock %}
+{% block page_heading %}My Profile{% endblock %}
+{% block page_description %}Manage your personal information and password.{% endblock %}
+{% block body %}
+<div class="row justify-content-center"><div class="col-xl-8">
+    {% for message in app.flashes('success') %}<div class="alert alert-success">{{ message }}</div>{% endfor %}
+    {% for error in errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+    <div class="card"><div class="card-body p-4 p-md-5">
+        <div class="d-flex align-items-center gap-3 mb-4"><span class="customer-avatar" style="width:52px;height:52px;font-size:20px">{{ account.name|first|upper }}</span><div><h1 class="h4 fw-bold mb-1">Account information</h1><p class="text-secondary mb-0">Update your name, email address, or password.</p></div></div>
+        <form method="post"><input type="hidden" name="_token" value="{{ csrf_token('account_profile_' ~ account.id) }}">
+            <div class="mb-3"><label class="form-label" for="profile_name">Full name</label><input id="profile_name" class="form-control" name="name" maxlength="120" value="{{ account.name }}" required></div>
+            <div class="mb-4"><label class="form-label" for="profile_email">Email address</label><input id="profile_email" class="form-control" type="email" name="email" value="{{ account.email }}" required></div>
+            <hr><h2 class="h6 fw-bold">Change password</h2><p class="small text-secondary">Leave both password fields blank if you do not want to change your password here.</p>
+            <div class="mb-3"><label class="form-label" for="current_password">Current password</label><input id="current_password" class="form-control" type="password" name="current_password" autocomplete="current-password"></div>
+            <div class="mb-4"><label class="form-label" for="new_password">New password</label><input id="new_password" class="form-control" type="password" name="new_password" minlength="8" autocomplete="new-password"></div>
+            <button class="btn btn-primary" type="submit">Save changes</button>
+            <a href="{{ path('account_password') }}" class="btn btn-outline-secondary ms-2">Change password separately</a>
+        </form>
+    </div></div>
+</div></div>
+{% endblock %}

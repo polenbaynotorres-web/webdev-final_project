@@ -1,0 +1,72 @@
+{% extends 'customer/base.html.twig' %}
+{% block title %}{{ vehicle.name }}{% endblock %}
+
+{% block body %}
+{% set mainImg = vehicle.imagePath starts with 'uploads/' ? vehicle.imagePath : 'images/' ~ (vehicle.imagePath|split('/')|last) %}
+<a href="{{ path('fleet_index') }}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Back to fleet</a>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <img id="vehicleImage" src="{{ asset(mainImg) }}" alt="{{ vehicle.name }}" class="vehicle-hero-img">
+            </div>
+        </div>
+        {% if colors|length > 1 %}
+            <div class="d-flex flex-wrap gap-2 mt-3" role="group" aria-label="Vehicle colors">
+                {% for color in colors %}
+                    {% set colorImg = color.imagePath starts with 'uploads/' ? color.imagePath : 'images/' ~ (color.imagePath|split('/')|last) %}
+                    <button type="button" class="color-swatch {{ loop.first ? 'active' }}"
+                            data-image="{{ asset(colorImg) }}" title="{{ color.colorName }}">
+                        <img src="{{ asset(colorImg) }}" alt="{{ color.colorName }}">
+                        <small class="d-block">{{ color.colorName }}</small>
+                    </button>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h3 fw-bold">{{ vehicle.name }}</h1>
+                <p class="text-secondary">
+                    {{ vehicle.vehicleClass|replace({'car-': '', 'motorcycle-scooter': 'Scooter'})|title }}
+                </p>
+                <p class="fs-3 fw-bold mb-1">₱{{ vehicle.price|number_format(2) }} <small class="fs-6 text-secondary fw-normal">/ day</small></p>
+                <ul class="list-unstyled my-3">
+                    <li><strong>Seats:</strong> {{ vehicle.seats }}</li>
+                    <li><strong>Colors in stock:</strong>
+                        {% if colors is empty %}
+                            <span class="text-danger">None</span>
+                        {% else %}
+                            {% for color in colors %}{{ color.colorName }}{{ not loop.last ? ', ' }}{% endfor %}
+                        {% endif %}
+                    </li>
+                </ul>
+
+                {% if colors is empty %}
+                    <div class="alert alert-secondary mb-0">This vehicle is currently unavailable.</div>
+                {% elseif is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                    <div class="alert alert-info mb-0">Reservations are made from customer accounts.</div>
+                {% else %}
+                    <a href="{{ path('user_vehicle_book', {slug: vehicle.slug}) }}" class="btn btn-tv btn-lg w-100">
+                        {{ app.user ? 'Reserve this vehicle' : 'Log in to reserve' }}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.querySelectorAll('.color-swatch').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.getElementById('vehicleImage').src = btn.dataset.image;
+            document.querySelectorAll('.color-swatch').forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+        });
+    });
+</script>
+{% endblock %}

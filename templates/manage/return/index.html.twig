@@ -1,0 +1,232 @@
+
+{% extends is_granted('ROLE_ADMIN') ? 'admin/base.html.twig' : 'staff/base.html.twig' %}
+
+{% block title %}Vehicle Returns{% endblock %}
+{% block page_heading %}Vehicle Returns & Inspection{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+    <div class="mb-4">
+        <h1 class="h4 mb-1">Vehicle Return Requests</h1>
+        <p class="text-secondary mb-0">
+            Review customer reports, inspect the vehicle, and confirm the return.
+        </p>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            {% if returns is empty %}
+
+                <div class="text-center text-secondary py-5">
+                    No vehicle return requests yet.
+                </div>
+
+            {% else %}
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>No.</th>
+                                <th>Customer</th>
+                                <th>Vehicle</th>
+                                <th>Customer Report</th>
+                                <th>Status</th>
+                                <th style="min-width:330px">
+                                    Inspection / Action
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for item in returns %}
+                            {% set reservation = item.reservation %}
+
+                            <tr>
+                                <td>
+                                    <strong>{{ loop.index }}</strong>
+                                    <div class="small text-secondary">
+                                        {{ item.requestedAt|date('M d, Y h:i A') }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    {{ reservation.user.name }}
+                                    <div class="small text-secondary">
+                                        {{ reservation.phone }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    {{ reservation.vehicle.name }}
+                                </td>
+
+                                <td>
+                                    <span class="badge {{ item.customerCondition == 'damage' ? 'text-bg-danger' : 'text-bg-success' }}">
+                                        {{ item.customerCondition == 'damage' ? 'Damage reported' : 'No damage reported' }}
+                                    </span>
+
+                                    <div class="small text-secondary mt-1">
+                                        {{ item.customerNotes ?: 'No remarks' }}
+                                    </div>
+
+                                    {% if item.customerPhoto %}
+                                        <a
+                                            class="small"
+                                            href="{{ asset(item.customerPhoto) }}"
+                                            target="_blank"
+                                            rel="noopener"
+                                        >
+                                            View customer photo
+                                        </a>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <span class="badge {{ item.status == 'confirmed' ? 'text-bg-success' : (item.status == 'inspected' ? 'text-bg-info' : 'text-bg-warning') }}">
+                                        {{ item.status|capitalize }}
+                                    </span>
+
+                                    {% if item.inspectedBy %}
+                                        <div class="small text-secondary mt-1">
+                                            By {{ item.inspectedBy.name }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if item.status == 'confirmed' %}
+
+                                        <div class="small">
+                                            <strong>Final condition:</strong>
+                                            {{ item.inspectedCondition == 'damage' ? 'Damage found' : 'No damage found' }}
+
+                                            <br>
+
+                                            {{ item.inspectionNotes ?: 'No inspection remarks' }}
+                                        </div>
+
+                                    {% elseif item.status == 'inspected' and is_granted('ROLE_STAFF') and not is_granted('ROLE_ADMIN') and item.inspectedBy and item.inspectedBy.id != app.user.id %}
+
+                                        <span class="small text-secondary">
+                                            Inspection is being handled by
+                                            {{ item.inspectedBy.name }}.
+                                            Staff may update only their own inspections.
+                                        </span>
+
+                                    {% else %}
+
+                                        <form
+                                            method="post"
+                                            enctype="multipart/form-data"
+                                            action="{{ path('manage_return_inspect', {id: item.id}) }}"
+                                            class="border rounded p-3"
+                                        >
+                                            <input
+                                                type="hidden"
+                                                name="_token"
+                                                value="{{ csrf_token('inspect_return_' ~ item.id) }}"
+                                            >
+
+                                            <label class="form-label small fw-semibold">
+                                                Actual inspection result
+                                            </label>
+
+                                            <select
+                                                name="condition"
+                                                class="form-select form-select-sm mb-2"
+                                                required
+                                            >
+                                                <option value="">Select condition</option>
+
+                                                <option
+                                                    value="none"
+                                                    {{ item.inspectedCondition == 'none' ? 'selected' : '' }}
+                                                >
+                                                    No damage found
+                                                </option>
+
+                                                <option
+                                                    value="damage"
+                                                    {{ item.inspectedCondition == 'damage' ? 'selected' : '' }}
+                                                >
+                                                    Damage found
+                                                </option>
+                                            </select>
+
+                                            <textarea
+                                                name="notes"
+                                                class="form-control form-control-sm mb-2"
+                                                rows="2"
+                                                placeholder="Inspection notes / damage details"
+                                            >{{ item.inspectionNotes }}</textarea>
+
+                                            <input
+                                                type="file"
+                                                name="photo"
+                                                class="form-control form-control-sm mb-2"
+                                                accept="image/jpeg,image/png,image/webp"
+                                                aria-label="Inspection photo"
+                                            >
+
+                                            {% if item.inspectionPhoto %}
+                                                <a
+                                                    class="small d-block mb-2"
+                                                    href="{{ asset(item.inspectionPhoto) }}"
+                                                    target="_blank"
+                                                    rel="noopener"
+                                                >
+                                                    View inspection photo
+                                                </a>
+                                            {% endif %}
+
+                                            <div class="d-flex gap-2">
+
+                                                <button
+                                                    name="decision"
+                                                    value="inspect"
+                                                    class="btn btn-sm btn-outline-primary"
+                                                >
+                                                    Save inspection
+                                                </button>
+
+                                                <button
+                                                    name="decision"
+                                                    value="confirm"
+                                                    class="btn btn-sm btn-success"
+                                                    onclick="return confirm('Confirm this vehicle return and complete the rental?')"
+                                                >
+                                                    Confirm return
+                                                </button>
+
+                                            </div>
+                                        </form>
+
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

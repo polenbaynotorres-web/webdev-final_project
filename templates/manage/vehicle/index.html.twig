@@ -1,7 +1,7 @@
+
 {% extends is_granted('ROLE_ADMIN') ? 'admin/base.html.twig' : 'staff/base.html.twig' %}
 
 {% block title %}Manage Vehicles{% endblock %}
-
 {% block page_heading %}Vehicle Management{% endblock %}
 
 {% block body %}
@@ -10,7 +10,9 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
         <div>
             <h2 class="h4 mb-1">Vehicles</h2>
-            <p class="text-muted mb-0">Manage all vehicles in the rental system.</p>
+            <p class="text-muted mb-0">
+                Manage all vehicles in the rental system.
+            </p>
         </div>
 
         <a href="{{ path('vehicle_new') }}" class="btn btn-primary">
@@ -36,31 +38,46 @@
         <div class="card-body">
 
             {% if vehicles is not empty %}
+
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
+
                         <thead class="table-light">
                             <tr>
+                                <th>No.</th>
                                 <th>Image</th>
                                 <th>Vehicle</th>
                                 <th>Category</th>
                                 <th>Seats</th>
                                 <th>Price per Day</th>
+                                <th>Created By</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             {% for vehicle in vehicles %}
+
                                 {% set imageUrl = vehicle.imagePath starts with 'assets/img/'
                                     ? 'images/' ~ vehicle.imagePath|replace({'assets/img/': ''})
                                     : vehicle.imagePath %}
 
+                                {% set isAdmin = is_granted('ROLE_ADMIN') %}
+                                {% set isOwner = vehicle.createdBy is not null
+                                    and app.user is not null
+                                    and vehicle.createdBy.id == app.user.id %}
+                                {% set canManage = isAdmin or isOwner %}
+
                                 <tr>
+                                    <td>
+                                        <strong>{{ loop.index }}</strong>
+                                    </td>
+
                                     <td>
                                         <img
                                             src="{{ asset(imageUrl) }}"
                                             alt="{{ vehicle.name }}"
-                                            style="width: 100px; height: 65px; object-fit: contain;"
+                                            style="width: 100px; height:65px; object-fit: contain;"
                                         >
                                     </td>
 
@@ -81,53 +98,87 @@
                                         ₱{{ vehicle.price|number_format(2, '.', ',') }}
                                     </td>
 
+                                    <td>
+                                        {% if vehicle.createdBy is null %}
+                                            <span class="badge bg-secondary">
+                                                Legacy
+                                            </span>
+                                        {% elseif isOwner %}
+                                            <span class="badge bg-success">
+                                                You
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-info text-dark">
+                                                {{ vehicle.createdBy.name }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center gap-2">
+                                        <div class="d-flex justify-content-center gap-2 flex-wrap">
 
-                                            <a
-                                                href="{{ path('vehicle_edit', {id: vehicle.id}) }}"
-                                                class="btn btn-sm btn-outline-primary"
-                                            >
-                                                Edit
-                                            </a>
-
-                                            <form
-                                                method="post"
-                                                action="{{ path('vehicle_delete', {id: vehicle.id}) }}"
-                                                onsubmit="return confirm('Are you sure you want to delete this vehicle?');"
-                                            >
-                                                <input
-                                                    type="hidden"
-                                                    name="_token"
-                                                    value="{{ csrf_token('delete_vehicle_' ~ vehicle.id) }}"
+                                            {% if canManage %}
+                                                <a
+                                                    href="{{ path('vehicle_color_index', {vehicleId: vehicle.id}) }}"
+                                                    class="btn btn-sm btn-outline-secondary"
                                                 >
+                                                    Colors
+                                                </a>
 
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-sm btn-outline-danger"
+                                                <a
+                                                    href="{{ path('vehicle_edit', {id: vehicle.id}) }}"
+                                                    class="btn btn-sm btn-outline-primary"
                                                 >
-                                                    Delete
-                                                </button>
-                                            </form>
+                                                    Edit
+                                                </a>
+
+                                                <form
+                                                    method="post"
+                                                    action="{{ path('vehicle_delete', {id: vehicle.id}) }}"
+                                                    onsubmit="return confirm('Are you sure you want to delete this vehicle?');"
+                                                >
+                                                    <input
+                                                        type="hidden"
+                                                        name="_token"
+                                                        value="{{ csrf_token('delete_vehicle_' ~ vehicle.id) }}"
+                                                    >
+
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <span class="text-muted small">
+                                                    View only
+                                                </span>
+                                            {% endif %}
 
                                         </div>
                                     </td>
                                 </tr>
+
                             {% endfor %}
                         </tbody>
+
                     </table>
                 </div>
 
             {% else %}
+
                 <div class="text-center py-5">
                     <h5>No vehicles found</h5>
                     <p class="text-muted">
                         Add your first vehicle to get started.
                     </p>
+
                     <a href="{{ path('vehicle_new') }}" class="btn btn-primary">
                         Add Vehicle
                     </a>
                 </div>
+
             {% endif %}
 
         </div>

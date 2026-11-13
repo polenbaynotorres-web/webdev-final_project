@@ -1,0 +1,166 @@
+
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Customers{% endblock %}
+{% block page_heading %}Customers{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-0">
+
+    <div class="mb-4">
+        <h3>Customer Management</h3>
+        <p class="text-muted mb-0">
+            View, edit, disable or delete customer accounts.
+        </p>
+    </div>
+
+    {% include '_partials/flashes.html.twig' %}
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get"
+                  action="{{ path('admin_customer_index') }}"
+                  class="row g-2 align-items-end">
+
+                <div class="col-md-8">
+                    <label for="search" class="form-label">
+                        Search customers
+                    </label>
+
+                    <input
+                        type="text"
+                        id="search"
+                        name="search"
+                        class="form-control"
+                        placeholder="Name, username or email"
+                        value="{{ search|default('') }}"
+                    >
+                </div>
+
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        Search
+                    </button>
+
+                    <a href="{{ path('admin_customer_index') }}"
+                       class="btn btn-outline-secondary">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Name</th>
+                            <th>Username / Email</th>
+                            <th>Status</th>
+                            <th>Date Created</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for customer in customers %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+
+                            <td>{{ customer.name }}</td>
+
+                            <td>
+                                {{ customer.username ?? '—' }}
+                                <div class="small text-muted">
+                                    {{ customer.email ?? '—' }}
+                                </div>
+                            </td>
+
+                            <td>
+                                {% if customer.active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Disabled</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ customer.createdAt
+                                    ? customer.createdAt|date('M d, Y')
+                                    : '—' }}
+                            </td>
+
+                            <td class="text-end text-nowrap">
+
+                                <a href="{{ path('reservation_index', {search: customer.name}) }}"
+                                   class="btn btn-sm btn-outline-secondary">
+                                    Reservations
+                                </a>
+
+                                <a href="{{ path('admin_customer_edit', {id: customer.id}) }}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Edit
+                                </a>
+
+                                <form
+                                    method="post"
+                                    action="{{ path('admin_customer_status', {id: customer.id}) }}"
+                                    class="d-inline"
+                                    onsubmit="return confirm('{{ customer.active ? 'Disable': 'Enable' }} this customer account?');"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="_token"
+                                        value="{{ csrf_token('customer_status_' ~ customer.id) }}"
+                                    >
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-secondary">
+                                        {{ customer.active ? 'Disable' : 'Enable' }}
+                                    </button>
+                                </form>
+
+                                <form
+                                    method="post"
+                                    action="{{ path('admin_customer_delete', {id: customer.id}) }}"
+                                    class="d-inline"
+                                    onsubmit="return confirm('Delete this customer account? Their reservation history and related records will be preserved.');"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="_token"
+                                        value="{{ csrf_token('customer_delete_' ~ customer.id) }}"
+                                    >
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-danger">
+                                        Delete
+                                    </button>
+                                </form>
+
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6"
+                                class="text-center text-muted py-4">
+                                No customers found.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

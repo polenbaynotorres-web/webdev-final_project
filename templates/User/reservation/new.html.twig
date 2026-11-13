@@ -1,0 +1,106 @@
+{% extends 'customer/portal.html.twig' %}
+{% block title %}Reserve {{ vehicle.name }}{% endblock %}
+{% block page_heading %}New Reservation{% endblock %}
+{% block page_description %}Complete the details below to request your vehicle booking.{% endblock %}
+
+{% block body %}
+{% set img = vehicle.imagePath starts with 'uploads/' ? vehicle.imagePath : 'images/' ~ (vehicle.imagePath|split('/')|last) %}
+<a href="{{ path('vehicle_details', {slug: vehicle.slug}) }}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Back to vehicle</a>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <img src="{{ asset(img) }}" alt="{{ vehicle.name }}" class="vehicle-hero-img mb-3">
+                <h1 class="h4 fw-bold">{{ vehicle.name }}</h1>
+                <p class="text-secondary mb-1">{{ vehicle.seats }} seats</p>
+                <p class="fw-bold fs-5 mb-0">₱<span id="dailyPrice">{{ vehicle.price|number_format(2, '.', '') }}</span> <small class="text-secondary fw-normal">/ day</small></p>
+                <hr>
+                <p class="mb-0 text-secondary">Estimated total: <strong id="estimate">—</strong></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <h2 class="h4 fw-bold mb-3">Reservation details</h2>
+        {% include '_partials/errors.html.twig' %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="post" action="{{ path('user_vehicle_book', {slug: vehicle.slug}) }}" novalidate>
+                    <input type="hidden" name="_token" value="{{ csrf_token('reserve_vehicle_' ~ vehicle.id) }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="color_id" class="form-label">Color</label>
+                            <select id="color_id" name="color_id" class="form-select" required>
+                                <option value="">Select a color</option>
+                                {% for color in colors %}
+                                    <option value="{{ color.id }}" {{ form.color_id == color.id ~ '' ? 'selected' }}>{{ color.colorName }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="location_id" class="form-label">Pickup location</label>
+                            <select id="location_id" name="location_id" class="form-select" required>
+                                <option value="">Select a location</option>
+                                {% for location in locations %}
+                                    <option value="{{ location.id }}" {{ form.location_id == location.id ~ '' ? 'selected' }}>{{ location.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Contact number</label>
+                            <input type="tel" id="phone" name="phone" class="form-control" maxlength="20" required value="{{ form.phone }}" placeholder="09XX XXX XXXX">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="payment_method" class="form-label">Payment method</label>
+                            <select id="payment_method" name="payment_method" class="form-select" required>
+                                <option value="">Select payment method</option>
+                                {% for method in paymentMethods %}
+                                    <option value="{{ method }}" {{ form.payment_method == method ? 'selected' }}>{{ method }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label for="pickup_date" class="form-label">Pickup date</label>
+                            <input type="date" id="pickup_date" name="pickup_date" class="form-control" required min="{{ 'now'|date('Y-m-d') }}" value="{{ form.pickup_date }}">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label for="pickup_time" class="form-label">Pickup time</label>
+                            <input type="time" id="pickup_time" name="pickup_time" class="form-control" required value="{{ form.pickup_time }}">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label for="return_date" class="form-label">Return date</label>
+                            <input type="date" id="return_date" name="return_date" class="form-control" required min="{{ 'now'|date('Y-m-d') }}" value="{{ form.return_date }}">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label for="return_time" class="form-label">Return time</label>
+                            <input type="time" id="return_time" name="return_time" class="form-control" required value="{{ form.return_time }}">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-tv btn-lg mt-4">Confirm reservation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    (function () {
+        var price = parseFloat(document.getElementById('dailyPrice').textContent);
+        var out = document.getElementById('estimate');
+        function update() {
+            var a = new Date(document.getElementById('pickup_date').value + 'T' + (document.getElementById('pickup_time').value || '00:00'));
+            var b = new Date(document.getElementById('return_date').value + 'T' + (document.getElementById('return_time').value || '00:00'));
+            if (isNaN(a) || isNaN(b) || b <= a) { out.textContent = '—'; return; }
+            var days = Math.max(1, Math.ceil((b - a) / 86400000));
+            out.textContent = days + (days === 1 ? ' day' : ' days') + ' × ₱' + price.toLocaleString() +
+                ' = ₱' + (days * price).toLocaleString(undefined, {minimumFractionDigits: 2});
+        }
+        ['pickup_date', 'pickup_time', 'return_date', 'return_time'].forEach(function (id) {
+            document.getElementById(id).addEventListener('input', update);
+        });
+        update();
+    })();
+</script>
+{% endblock %}

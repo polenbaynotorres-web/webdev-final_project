@@ -1,0 +1,165 @@
+
+{% extends 'customer/portal.html.twig' %}
+
+{% block title %}Return Vehicle{% endblock %}
+{% block page_heading %}Return Vehicle{% endblock %}
+{% block page_description %}Submit your vehicle condition for inspection.{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <a href="{{ path('user_reservation_index') }}"
+           class="btn btn-outline-secondary btn-sm mb-3">
+            &larr; Back to my reservations
+        </a>
+
+        <h1 class="h3 fw-bold mb-1">Return vehicle</h1>
+
+        <p class="text-secondary">
+            Reservation #{{ reservation.id }}
+            &middot; {{ reservation.vehicle.name }}
+        </p>
+
+        {% include '_partials/errors.html.twig' %}
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-sm-6">
+                        <p class="mb-1">
+                            <strong>Pickup:</strong>
+                            {{ reservation.pickupDate|date('M d, Y') }}
+                            {{ reservation.pickupTime|date('h:i A') }}
+                        </p>
+
+                        <p class="mb-0">
+                            <strong>Scheduled return:</strong>
+                            {{ reservation.returnDate|date('M d, Y') }}
+                            {{ reservation.returnTime|date('h:i A') }}
+                        </p>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <p class="mb-0">
+                            <strong>Return location:</strong>
+                            {{ reservation.location.name }}
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+
+                <form method="post"
+                      action="{{ path('user_return_request', {id: reservation.id}) }}"
+                      novalidate>
+
+                    <input type="hidden"
+                           name="_token"
+                           value="{{ csrf_token('vehicle_return_' ~ reservation.id) }}">
+
+                    <h2 class="h5">Vehicle condition</h2>
+
+                    <p class="text-secondary">
+                        Please check the vehicle before returning it and report
+                        its condition honestly. Our team will inspect it and
+                        confirm the return.
+                    </p>
+
+                    <div class="form-check mb-2">
+                        <input
+                            class="form-check-input"
+                            type="radio"
+                            name="condition"
+                            id="cond_none"
+                            value="none"
+                            {{ condition != 'damage' ? 'checked' }}
+                        >
+
+                        <label class="form-check-label" for="cond_none">
+                            No damage &mdash; the vehicle is in the same
+                            condition as when I picked it up
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input
+                            class="form-check-input"
+                            type="radio"
+                            name="condition"
+                            id="cond_damage"
+                            value="damage"
+                            {{ condition == 'damage' ? 'checked' }}
+                        >
+
+                        <label class="form-check-label" for="cond_damage">
+                            There is damage to report
+                        </label>
+                    </div>
+
+                    <div id="damageBox"
+                         class="mb-3"
+                         {{ condition != 'damage' ? 'hidden' }}>
+
+                        <label for="damage_notes" class="form-label">
+                            Describe the damage
+                        </label>
+
+                        <textarea
+                            id="damage_notes"
+                            name="damage_notes"
+                            class="form-control"
+                            rows="4"
+                            maxlength="1000"
+                            placeholder="Where is the damage and what happened?"
+                        >{{ notes }}</textarea>
+
+                        <div class="form-text">
+                            10 to 1000 characters.
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="confirm"
+                            id="confirm"
+                            value="1"
+                        >
+
+                        <label class="form-check-label" for="confirm">
+                            I confirm that the information above is accurate.
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-tv btn-lg">
+                        Submit return
+                    </button>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    (function () {
+        var box = document.getElementById('damageBox');
+
+        document.querySelectorAll('input[name="condition"]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                box.hidden = !document.getElementById('cond_damage').checked;
+            });
+        });
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,113 @@
+
+{% extends is_granted('ROLE_ADMIN') ? 'admin/base.html.twig' : 'staff/base.html.twig' %}
+
+{% block title %}{{ isEdit ? 'Edit Vehicle Color' : 'Add Vehicle Color' }}{% endblock %}
+
+{% block page_heading %}
+    {{ isEdit ? 'Edit Vehicle Color' : 'Add Vehicle Color' }}
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-0">
+
+    <a href="{{ path('vehicle_color_index', {vehicleId: vehicle.id}) }}"
+       class="btn btn-sm btn-outline-secondary mb-3">
+        &larr; Back to {{ vehicle.name }} colors
+    </a>
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0">
+                {{ isEdit ? 'Update color details' : 'Add a color option' }}
+            </h5>
+        </div>
+
+        <div class="card-body p-4">
+
+            {% include '_partials/errors.html.twig' %}
+
+            <form method="post" enctype="multipart/form-data">
+
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="{{ csrf_token(isEdit ? 'vehicle_color_edit_' ~ color.id : 'vehicle_color_new_' ~ vehicle.id) }}">
+
+                <div class="mb-3">
+                    <label for="color_name" class="form-label">
+                        Color name
+                    </label>
+
+                    <input
+                        id="color_name"
+                        name="color_name"
+                        class="form-control"
+                        maxlength="60"
+                        required
+                        value="{{ name }}">
+                </div>
+
+                {% if isEdit %}
+                    <div class="mb-3">
+                        <label class="form-label d-block">
+                            Current image
+                        </label>
+
+                        <img
+                            src="{{ asset(color.imagePath) }}"
+                            alt="{{ color.colorName }}"
+                            style="max-width:260px;max-height:160px;object-fit:contain"
+                            class="border rounded p-2">
+                    </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="image" class="form-label">
+                        {{ isEdit ? 'Replace image (optional)' : 'Color image' }}
+                    </label>
+
+                    <input
+                        id="image"
+                        name="image"
+                        type="file"
+                        class="form-control"
+                        accept="image/jpeg,image/png,image/webp"
+                        {{ isEdit ? '' : 'required' }}>
+
+                    <div class="form-text">
+                        JPG, PNG, or WebP; maximum 5 MB.
+                    </div>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input
+                        id="in_stock"
+                        name="in_stock"
+                        type="checkbox"
+                        value="1"
+                        class="form-check-input"
+                        {{ (isEdit ? color.inStock : true) ? 'checked' }}>
+
+                    <label for="in_stock" class="form-check-label">
+                        Available for reservation
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    {{ isEdit ? 'Save Changes' : 'Add Color' }}
+                </button>
+
+                <a
+                    href="{{ path('vehicle_color_index', {vehicleId: vehicle.id}) }}"
+                    class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

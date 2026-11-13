@@ -1,0 +1,132 @@
+{% extends is_granted('ROLE_ADMIN') ? 'admin/base.html.twig' : 'staff/base.html.twig' %}
+
+{% block title %}Reservation Details{% endblock %}
+
+{% block page_heading %}Reservation Details{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h4 mb-1">Reservation #{{ reservation.id }}</h2>
+            <p class="text-muted mb-0">Complete reservation information.</p>
+        </div>
+
+        <a href="{{ path('reservation_index') }}"
+           class="btn btn-outline-secondary">
+            Back to Reservations
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="mb-3">Customer Information</h5>
+
+                    <p><strong>Name:</strong> {{ reservation.user.name }}</p>
+                    <p><strong>Email:</strong> {{ reservation.user.email ?? 'Not provided' }}</p>
+                    <p><strong>Phone:</strong> {{ reservation.phone }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="mb-3">Vehicle Information</h5>
+
+                    <p><strong>Vehicle:</strong> {{ reservation.vehicle.name }}</p>
+                    <p><strong>Selected Color:</strong> {{ color.color_name ?? 'Color information unavailable' }}</p>
+                    <p><strong>Vehicle Price:</strong> ₱{{ reservation.vehicle.price|number_format(2) }}</p>
+                    <p><strong>Pickup Location:</strong> {{ reservation.location.name }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="mb-3">Rental Schedule</h5>
+
+                    <p>
+                        <strong>Pickup Date:</strong>
+                        {{ reservation.pickupDate|date('F d, Y') }}
+                    </p>
+
+                    <p>
+                        <strong>Pickup Time:</strong>
+                        {{ reservation.pickupTime|date('h:i A') }}
+                    </p>
+
+                    <p>
+                        <strong>Return Date:</strong>
+                        {{ reservation.returnDate|date('F d, Y') }}
+                    </p>
+
+                    <p>
+                        <strong>Return Time:</strong>
+                        {{ reservation.returnTime|date('h:i A') }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="mb-3">Payment and Status</h5>
+
+                    <p>
+                        <strong>Payment Method:</strong>
+                        {{ reservation.paymentMethod ?? 'Not specified' }}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        {% if reservation.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending Approval</span>
+                        {% elseif reservation.status == 'confirmed' %}
+                            <span class="badge bg-success">Confirmed</span>
+                        {% elseif reservation.status == 'completed' %}
+                            <span class="badge bg-info text-dark">Completed</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Cancelled</span>
+                        {% endif %}
+                    </p>
+
+                    {% if reservation.status == 'pending' %}
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <form method="post" action="{{ path('reservation_confirm', {id: reservation.id}) }}" onsubmit="return confirm('Approve this reservation?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('confirm_reservation_' ~ reservation.id) }}">
+                                <button type="submit" class="btn btn-success">Approve Reservation</button>
+                            </form>
+                            <form method="post" action="{{ path('reservation_cancel', {id: reservation.id}) }}" onsubmit="return confirm('Reject/cancel this reservation?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('cancel_reservation_' ~ reservation.id) }}">
+                                <button type="submit" class="btn btn-outline-danger">Reject Reservation</button>
+                            </form>
+                        </div>
+                    {% endif %}
+
+                    <p>
+                        <strong>Created At:</strong>
+                        {{ reservation.createdAt|date('F d, Y h:i A') }}
+                    </p>
+
+                    <p>
+                        <strong>Cancelled At:</strong>
+                        {% if reservation.cancelledAt %}
+                            {{ reservation.cancelledAt|date('F d, Y h:i A') }}
+                        {% else %}
+                            Not cancelled
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

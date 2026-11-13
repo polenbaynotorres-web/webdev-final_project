@@ -1,0 +1,271 @@
+
+{% extends 'customer/portal.html.twig' %}
+
+{% block title %}Browse Vehicles{% endblock %}
+
+{% block portal_eyebrow %}VEHICLE RENTAL{% endblock %}
+
+{% block page_heading %}Browse Vehicles{% endblock %}
+
+{% block page_description %}
+    Explore our available vehicles and find the perfect ride for your journey.
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <style>
+        .fleet-heading {
+            margin-bottom: 28px;
+        }
+
+        .fleet-heading h1 {
+            color: #16324f;
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .fleet-heading p {
+            color: #64748b;
+            margin-bottom: 0;
+        }
+
+        .fleet-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .vehicle-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 18px rgba(15,23,42,.06);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 22px rgba(15,23,42,.10);
+        }
+
+        .vehicle-image {
+            width: 100%;
+            height: 190px;
+            object-fit: contain;
+            background: #fff;
+            padding: 10px;
+        }
+
+        .vehicle-details {
+            padding: 18px;
+        }
+
+        .vehicle-details h2 {
+            color: #16324f;
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .vehicle-info {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .vehicle-price {
+            color: #16324f;
+            font-size: 21px;
+            font-weight: 800;
+            margin: 14px 0;
+        }
+
+        .vehicle-price small {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .vehicle-colors {
+            margin: 14px 0;
+        }
+
+        .color-tag {
+            display: inline-block;
+            background: #edf1f5;
+            padding: 5px 9px;
+            margin: 3px;
+            border-radius: 5px;
+            color: #475569;
+            font-size: 12px;
+        }
+
+        .stock-status {
+            color: #198754;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .out-of-stock {
+            color: #dc3545;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .rent-button {
+            display: block;
+            background: #16324f;
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 14px;
+            transition: background .2s ease;
+        }
+
+        .rent-button:hover {
+            background: #2878d0;
+            color: #fff;
+        }
+
+        .empty-fleet {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 35px 20px;
+            text-align: center;
+            color: #64748b;
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 1200px) {
+            .fleet-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .fleet-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fleet-heading h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+    <div class="fleet-heading">
+        <h1>OUR VEHICLE FLEET</h1>
+        <p>Choose the perfect vehicle for your journey.</p>
+    </div>
+
+    <div class="fleet-grid">
+
+        {% for vehicle in vehicles %}
+
+            {% set availableColors = colorsByVehicle[vehicle.id]|default([]) %}
+            {% set imageFilename = vehicle.imagePath|split('/')|last %}
+
+            <div class="vehicle-card">
+
+                {% if vehicle.imagePath starts with 'uploads/' %}
+
+                    <img
+                        src="{{ asset(vehicle.imagePath) }}"
+                        alt="{{ vehicle.name }}"
+                        class="vehicle-image"
+                    >
+
+                {% else %}
+
+                    <img
+                        src="{{ asset('images/' ~ imageFilename) }}"
+                        alt="{{ vehicle.name }}"
+                        class="vehicle-image"
+                    >
+
+                {% endif %}
+
+                <div class="vehicle-details">
+
+                    <h2>{{ vehicle.name }}</h2>
+
+                    <div class="vehicle-info">
+                        {{ vehicle.seats }} Seats ·
+                        {{ vehicle.vehicleClass|replace({
+                            'car-': '',
+                            'motorcycle-scooter': 'Scooter'
+                        })|title }}
+                    </div>
+
+                    <div class="vehicle-price">
+                        ₱{{ vehicle.price|number_format(2, '.', ',') }}
+                        <small>/ day</small>
+                    </div>
+
+                    <div class="vehicle-colors">
+
+                        <strong class="small">Available Colors:</strong>
+
+                        {% if availableColors is not empty %}
+
+                            <div>
+                                {% for color in availableColors %}
+                                    <span class="color-tag">
+                                        {{ color.colorName }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+
+                        {% else %}
+
+                            <p class="out-of-stock mt-2">OUT OF STOCK</p>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% if availableColors is not empty %}
+
+                        <p class="stock-status">AVAILABLE</p>
+
+                        <a
+                            href="{{ path('vehicle_details', {slug: vehicle.slug}) }}"
+                            class="rent-button"
+                        >
+                            VIEW DETAILS / RENT NOW
+                        </a>
+
+                    {% else %}
+
+                        <p class="out-of-stock">
+                            Currently unavailable
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-fleet">
+                <h5>No vehicles available</h5>
+                <p class="mb-0">There are currently no vehicles listed. Please check again later.</p>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+{% endblock %}

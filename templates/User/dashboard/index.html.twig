@@ -1,532 +1,375 @@
-{% extends 'base.html.twig' %}
 
-{% block title %}User Dashboard | Torres Vehicle Rental{% endblock %}
+{% extends 'customer/portal.html.twig' %}
+
+{% block title %}Customer Dashboard{% endblock %}
+
+{% block page_heading %}Dashboard{% endblock %}
+
+{% block page_description %}
+    Welcome back, {{ app.user.name }}. Here is your rental overview.
+{% endblock %}
 
 {% block stylesheets %}
-<style>
-    * {
-        box-sizing: border-box;
-    }
+    {{ parent() }}
 
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f3f5f8;
-        color: #1e293b;
-    }
-
-    /* MAIN LAYOUT */
-    .user-layout {
-        display: flex;
-        min-height: 100vh;
-        width: 100%;
-    }
-
-    /* SIDEBAR */
-    .user-sidebar {
-        position: sticky;
-        top: 0;
-        flex: 0 0 260px;
-        width: 260px;
-        height: 100vh;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-
-        background: #16324f;
-        color: #ffffff;
-
-        transition: width 0.28s ease, flex-basis 0.28s ease,
-                    visibility 0s linear 0.28s;
-    }
-
-    .user-brand {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 95px;
-        padding: 15px;
-        border-bottom: 1px solid rgba(255,255,255,0.12);
-    }
-
-    .user-brand img {
-        width: 190px;
-        height: 65px;
-        max-width: 100%;
-        object-fit: contain;
-    }
-
-    .user-sidebar-label {
-        margin: 25px 20px 12px;
-        color: #91a5bb;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 1.2px;
-        white-space: nowrap;
-    }
-
-    .user-sidebar-nav {
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-    }
-
-    .user-sidebar-nav a,
-    .user-sidebar-bottom a,
-    .user-sidebar-bottom button {
-        display: flex;
-        align-items: center;
-        gap: 13px;
-
-        min-height: 46px;
-        margin: 0 12px;
-        padding: 0 14px;
-
-        border: none;
-        border-radius: 9px;
-        background: transparent;
-
-        color: #cbd5e1;
-        text-decoration: none;
-        text-align: left;
-        font-family: inherit;
-        font-size: 13px;
-        font-weight: 500;
-        white-space: nowrap;
-
-        cursor: pointer;
-        transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .user-sidebar-nav a:hover,
-    .user-sidebar-bottom a:hover {
-        background: rgba(255,255,255,0.09);
-        color: #ffffff;
-    }
-
-    .user-sidebar-nav a.active {
-        background: #2878d0;
-        color: #ffffff;
-        font-weight: 600;
-    }
-
-    .user-sidebar-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 22px;
-        min-width: 22px;
-        font-size: 18px;
-    }
-
-    .user-sidebar-bottom {
-        margin-top: auto;
-        padding: 18px 0;
-        border-top: 1px solid rgba(255,255,255,0.15);
-    }
-
-    .user-sidebar-bottom form {
-        margin: 0;
-    }
-
-    .user-sidebar-bottom button {
-        width: calc(100% - 24px);
-        color: #fca5a5;
-    }
-
-    .user-sidebar-bottom button:hover {
-        background: rgba(239,68,68,0.13);
-        color: #ffffff;
-    }
-
-    /* COLLAPSED SIDEBAR - DESKTOP */
-    .user-layout.sidebar-collapsed .user-sidebar {
-        width: 0;
-        flex-basis: 0;
-        visibility: hidden;
-    }
-
-    /* MAIN AREA */
-    .user-main {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        min-width: 0;
-        min-height: 100vh;
-    }
-
-    /* HEADER */
-    .user-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-
-        min-height: 95px;
-        padding: 20px 30px;
-
-        background: #ffffff;
-        border-bottom: 1px solid #e2e8f0;
-        box-shadow: 0 2px 8px rgba(15,23,42,0.03);
-    }
-
-    .user-header-left {
-        display: flex;
-        align-items: center;
-        gap: 18px;
-        min-width: 0;
-    }
-
-    .sidebar-toggle {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-
-        width: 42px;
-        height: 42px;
-        flex: 0 0 42px;
-
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        background: #ffffff;
-        color: #16324f;
-
-        font-size: 21px;
-        cursor: pointer;
-        transition: background 0.2s ease;
-    }
-
-    .sidebar-toggle:hover {
-        background: #eff6ff;
-    }
-
-    .user-header-brand span {
-        display: block;
-        margin-bottom: 5px;
-        color: #2878d0;
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 1.5px;
-    }
-
-    .user-header-brand h2 {
-        margin: 0;
-        color: #16324f;
-        font-size: 20px;
-        font-weight: 700;
-    }
-
-    .user-logout-button {
-        padding: 10px 18px;
-        border: none;
-        border-radius: 6px;
-        background: #dc2626;
-        color: #ffffff;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    .user-logout-button:hover {
-        background: #b91c1c;
-    }
-
-    /* CONTENT */
-    .user-content {
-        flex: 1;
-        width: 100%;
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 35px 30px;
-    }
-
-    .user-welcome {
-        padding: 30px;
-        border-radius: 12px;
-        background: #ffffff;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
-
-    .user-welcome h1 {
-        margin-top: 0;
-        color: #16324f;
-    }
-
-    .user-welcome p {
-        color: #64748b;
-    }
-
-    /* FOOTER */
-    .user-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-
-        padding: 20px 30px;
-        background: #ffffff;
-        border-top: 1px solid #e2e8f0;
-
-        color: #64748b;
-        font-size: 12px;
-    }
-
-    .user-footer p {
-        margin: 0;
-    }
-
-    .user-footer strong {
-        color: #16324f;
-    }
-
-    /* MOBILE SIDEBAR BACKDROP */
-    .user-sidebar-backdrop {
-        display: none;
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 760px) {
-        .user-sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1100;
-
-            width: 260px;
-            flex: 0 0 260px;
-            visibility: visible;
-
-            transform: translateX(-100%);
-            transition: transform 0.28s ease;
+    <style>
+        .dashboard-page {
+            color: #183653;
         }
 
-        .user-layout.sidebar-open .user-sidebar {
-            transform: translateX(0);
-        }
-
-        .user-layout.sidebar-collapsed .user-sidebar {
-            width: 260px;
-            flex-basis: 260px;
-            visibility: visible;
-        }
-
-        .user-sidebar-backdrop {
-            display: block;
-            position: fixed;
-            inset: 0;
-            z-index: 1050;
-
-            background: rgba(15,23,42,0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.28s ease, visibility 0.28s ease;
-        }
-
-        .user-layout.sidebar-open .user-sidebar-backdrop {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .user-header {
-            padding: 18px 20px;
-        }
-
-        .user-content {
-            padding: 25px 20px;
-        }
-
-        .user-footer {
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 18px 20px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .user-header {
+        .dashboard-welcome {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 28px;
         }
 
-        .user-header-brand h2 {
-            font-size: 16px;
+        .dashboard-welcome h1 {
+            font-size: 25px;
+            font-weight: 800;
+            margin-bottom: 6px;
         }
 
-        .user-content {
-            padding: 18px 12px;
+        .dashboard-welcome p {
+            color: #718096;
+            margin: 0;
         }
 
-        .user-welcome {
+        .dashboard-browse-btn {
+            background: #193956;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            padding: 12px 20px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: .2s;
+        }
+
+        .dashboard-browse-btn:hover {
+            background: #2878ca;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .dashboard-stat {
+            background: #fff;
+            border: 1px solid #e1e8f0;
+            border-radius: 13px;
+            padding: 21px;
+            height: 100%;
+            box-shadow: 0 4px 14px rgba(24, 54, 83, .04);
+            transition: .2s;
+        }
+
+        .dashboard-stat:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(24, 54, 83, .09);
+        }
+
+        .stat-icon {
+            width: 43px;
+            height: 43px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 11px;
+            font-size: 21px;
+            margin-bottom: 17px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 7px;
+        }
+
+        .stat-number {
+            font-size: 29px;
+            font-weight: 800;
+            line-height: 1.2;
+            color: #193956;
+        }
+
+        .dashboard-section-title {
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 17px;
+            color: #183653;
+        }
+
+        .dashboard-action {
+            display: block;
+            background: white;
+            border: 1px solid #e1e8f0;
+            border-radius: 13px;
             padding: 22px;
+            height: 100%;
+            color: #183653;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(24, 54, 83, .04);
+            transition: .2s;
         }
-    }
-</style>
+
+        .dashboard-action:hover {
+            color: #2878ca;
+            border-color: #2878ca;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(24, 54, 83, .08);
+        }
+
+        .action-icon {
+            font-size: 29px;
+            margin-bottom: 13px;
+        }
+
+        .action-title {
+            display: block;
+            font-weight: 800;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .action-description {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        .dashboard-reservations {
+            background: white;
+            border: 1px solid #e1e8f0;
+            border-radius: 13px;
+            padding: 23px;
+            box-shadow: 0 4px 14px rgba(24, 54, 83, .04);
+        }
+
+        .dashboard-reservations .table th {
+            color: #718096;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .dashboard-reservations .table td {
+            color: #344b63;
+            font-size: 14px;
+        }
+
+        .dashboard-reservations .table > :not(caption) > * > * {
+            padding: 15px 10px;
+        }
+
+        @media (max-width: 576px) {
+            .dashboard-welcome h1 {
+                font-size: 21px;
+            }
+
+            .dashboard-stat {
+                padding: 16px;
+            }
+
+            .stat-number {
+                font-size: 25px;
+            }
+
+            .dashboard-reservations {
+                padding: 15px;
+            }
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
 
-<div class="user-layout" id="userLayout">
+<div class="dashboard-page">
 
-    <!-- USER SIDEBAR -->
-    <aside class="user-sidebar" id="userSidebar">
-
-        <div class="user-brand">
-            <img src="{{ asset('images/logo-cropped.png') }}"
-                 alt="Torres Vehicle Rental Logo">
+    {# Welcome section #}
+    <div class="dashboard-welcome">
+        <div>
+            <h1>Welcome, {{ app.user.name }}!</h1>
+            <p>Manage your reservations and plan your next trip.</p>
         </div>
 
-        <div class="user-sidebar-label">CUSTOMER MENU</div>
+        <a href="{{ path('fleet_index') }}" class="dashboard-browse-btn">
+            🚗 Browse Vehicles
+        </a>
+    </div>
 
-        <nav class="user-sidebar-nav">
+    {# Reservation statistics #}
+    <div class="row g-3 mb-4">
 
-            <a href="{{ path('user_dashboard') }}" class="active">
-                <span class="user-sidebar-icon">▦</span>
-                <span>Dashboard</span>
-            </a>
-
-        </nav>
-
-        <div class="user-sidebar-bottom">
-
-            <a href="/">
-                <span class="user-sidebar-icon">⌂</span>
-                <span>View Homepage</span>
-            </a>
-
-            <form method="post" action="{{ path('app_logout') }}">
-                <input type="hidden" name="_csrf_token"
-                       value="{{ csrf_token('logout') }}">
-
-                <button type="submit">
-                    <span class="user-sidebar-icon">⇥</span>
-                    <span>Logout</span>
-                </button>
-            </form>
-
-        </div>
-
-    </aside>
-
-    <!-- MOBILE BACKDROP -->
-    <div class="user-sidebar-backdrop"
-         id="userSidebarBackdrop"></div>
-
-    <!-- MAIN AREA -->
-    <main class="user-main">
-
-        <!-- HEADER -->
-        <header class="user-header">
-
-            <div class="user-header-left">
-
-                <button type="button"
-                        class="sidebar-toggle"
-                        id="sidebarToggle"
-                        aria-label="Toggle sidebar"
-                        aria-controls="userSidebar"
-                        aria-expanded="true">
-                    ☰
-                </button>
-
-                <div class="user-header-brand">
-                    <span>CUSTOMER PORTAL</span>
-                    <h2>Torres Vehicle Rental</h2>
+        <div class="col-6 col-xl">
+            <div class="dashboard-stat">
+                <div class="stat-icon" style="background:#e8f1fc;color:#2878ca;">
+                    📋
                 </div>
+                <div class="stat-label">Total Reservations</div>
+                <div class="stat-number">{{ totalReservations }}</div>
+            </div>
+        </div>
 
+        <div class="col-6 col-xl">
+            <div class="dashboard-stat">
+                <div class="stat-icon" style="background:#fff5df;color:#d99a16;">
+                    ⏳
+                </div>
+                <div class="stat-label">Pending Approval</div>
+                <div class="stat-number">{{ pendingReservations }}</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl">
+            <div class="dashboard-stat">
+                <div class="stat-icon" style="background:#e8f1fc;color:#2878ca;">
+                    🚘
+                </div>
+                <div class="stat-label">Confirmed Bookings</div>
+                <div class="stat-number">{{ activeRentals }}</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl">
+            <div class="dashboard-stat">
+                <div class="stat-icon" style="background:#fff5df;color:#d99a16;">
+                    🔄
+                </div>
+                <div class="stat-label">Pending Returns</div>
+                <div class="stat-number">{{ pendingReturns }}</div>
+            </div>
+        </div>
+
+        <div class="col-6 col-xl">
+            <div class="dashboard-stat">
+                <div class="stat-icon" style="background:#e5f7ed;color:#15945a;">
+                    ✅
+                </div>
+                <div class="stat-label">Completed Rentals</div>
+                <div class="stat-number">{{ completedRentals }}</div>
+            </div>
+        </div>
+
+    </div>
+
+    {# Quick actions #}
+    <h2 class="dashboard-section-title">Quick Actions</h2>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-sm-6 col-lg-4">
+            <a href="{{ path('fleet_index') }}" class="dashboard-action">
+                <div class="action-icon">🚗</div>
+                <span class="action-title">Browse Vehicles</span>
+                <span class="action-description">
+                    Explore vehicles available for rent.
+                </span>
+            </a>
+        </div>
+
+        <div class="col-sm-6 col-lg-4">
+            <a href="{{ path('user_reservation_index') }}" class="dashboard-action">
+                <div class="action-icon">📅</div>
+                <span class="action-title">My Reservations</span>
+                <span class="action-description">
+                    Review your bookings and their status.
+                </span>
+            </a>
+        </div>
+
+        <div class="col-sm-6 col-lg-4">
+            <a href="{{ path('account_profile') }}" class="dashboard-action">
+                <div class="action-icon">👤</div>
+                <span class="action-title">My Profile</span>
+                <span class="action-description">
+                    Update your personal information.
+                </span>
+            </a>
+        </div>
+
+    </div>
+
+    {# Recent reservations #}
+    <div class="dashboard-reservations">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h2 class="dashboard-section-title mb-0">Recent Reservations</h2>
+
+            <a href="{{ path('user_reservation_index') }}"
+               class="text-primary text-decoration-none fw-semibold">
+                View All →
+            </a>
+        </div>
+
+        {% if recentReservations is empty %}
+
+            <div class="text-center py-5">
+                <div style="font-size:42px;margin-bottom:12px;">🚘</div>
+
+                <h5 class="fw-bold">No reservations yet</h5>
+
+                <p class="text-secondary">
+                    You haven't made any vehicle reservations.
+                </p>
+
+                <a href="{{ path('fleet_index') }}" class="dashboard-browse-btn d-inline-block">
+                    Browse Vehicles
+                </a>
             </div>
 
-            <form method="post" action="{{ path('app_logout') }}">
-                <input type="hidden" name="_csrf_token"
-                       value="{{ csrf_token('logout') }}">
+        {% else %}
 
-                <button type="submit" class="user-logout-button">
-                    Logout
-                </button>
-            </form>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
 
-        </header>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Vehicle</th>
+                            <th>Pickup Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
 
-        <!-- PAGE CONTENT -->
-        <section class="user-content">
+                    <tbody>
+                        {% for reservation in recentReservations %}
+                            <tr>
+                                <td class="fw-semibold">
+                                    {{ loop.index }}
+                                </td>
 
-            <div class="user-welcome">
-                <h1>Welcome, {{ app.user.name }}!</h1>
-                <p>You are successfully logged in as a customer.</p>
+                                <td class="fw-semibold">
+                                    {{ reservation.vehicle.name }}
+                                </td>
+
+                                <td>
+                                    {{ reservation.pickupDate|date('M d, Y') }}
+                                </td>
+
+                                <td>
+                                    {{ reservation.returnDate|date('M d, Y') }}
+                                </td>
+
+                                <td>
+                                    <span class="badge text-bg-{{ reservation.status == 'completed' ? 'success' : (reservation.status == 'cancelled' ? 'secondary' : (reservation.status == 'pending' ? 'warning' : 'primary')) }}">
+                                        {{ reservation.status|capitalize }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
             </div>
 
-        </section>
+        {% endif %}
 
-        <!-- FOOTER -->
-        <footer class="user-footer">
-
-            <p>
-                &copy; {{ "now"|date("Y") }}
-                <strong>Torres Vehicle Rental</strong>.
-                All rights reserved.
-            </p>
-
-            <p>Customer Portal</p>
-
-        </footer>
-
-    </main>
+    </div>
 
 </div>
 
-{% endblock %}
-
-{% block javascripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const layout = document.getElementById('userLayout');
-        const toggle = document.getElementById('sidebarToggle');
-        const backdrop = document.getElementById('userSidebarBackdrop');
-
-        if (!layout || !toggle || !backdrop) {
-            return;
-        }
-
-        const mobileScreen = window.matchMedia('(max-width: 760px)');
-
-        function updateButton() {
-            const isOpen = mobileScreen.matches
-                ? layout.classList.contains('sidebar-open')
-                : !layout.classList.contains('sidebar-collapsed');
-
-            toggle.setAttribute('aria-expanded', String(isOpen));
-            toggle.setAttribute(
-                'aria-label',
-                isOpen ? 'Collapse sidebar' : 'Expand sidebar'
-            );
-        }
-
-        toggle.addEventListener('click', function () {
-            if (mobileScreen.matches) {
-                layout.classList.toggle('sidebar-open');
-            } else {
-                layout.classList.toggle('sidebar-collapsed');
-            }
-
-            updateButton();
-        });
-
-        backdrop.addEventListener('click', function () {
-            layout.classList.remove('sidebar-open');
-            updateButton();
-        });
-
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') {
-                layout.classList.remove('sidebar-open');
-                updateButton();
-            }
-        });
-
-        mobileScreen.addEventListener('change', function () {
-            layout.classList.remove('sidebar-open');
-            layout.classList.remove('sidebar-collapsed');
-            updateButton();
-        });
-
-        updateButton();
-    });
-</script>
 {% endblock %}

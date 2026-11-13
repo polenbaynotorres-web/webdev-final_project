@@ -1,0 +1,138 @@
+
+{% extends 'customer/portal.html.twig' %}
+
+{% block title %}Request Vehicle Return{% endblock %}
+{% block page_heading %}Return Vehicle{% endblock %}
+{% block page_description %}Submit the vehicle condition for staff inspection.{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-xl-8">
+
+        <a href="{{ path('user_reservation_index') }}"
+           class="btn btn-outline-secondary btn-sm mb-3">
+            &larr; Back to reservations
+        </a>
+
+        <div class="card">
+            <div class="card-body p-4 p-md-5">
+
+                <span class="badge text-bg-primary mb-2">
+                    Reservation #{{ reservation.id }}
+                </span>
+
+                <h1 class="h4 fw-bold">
+                    Return {{ reservation.vehicle.name }}
+                </h1>
+
+                <p class="text-secondary">
+                    Tell us the vehicle's current condition. Our staff will
+                    inspect it before the rental is marked completed.
+                </p>
+
+                <div class="bg-light rounded p-3 mb-4">
+                    <div>
+                        <strong>Pickup:</strong>
+                        {{ reservation.pickupDate|date('M d, Y') }}
+                        {{ reservation.pickupTime|date('h:i A') }}
+                    </div>
+
+                    <div>
+                        <strong>Scheduled return:</strong>
+                        {{ reservation.returnDate|date('M d, Y') }}
+                        {{ reservation.returnTime|date('h:i A') }}
+                    </div>
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+
+                    <input
+                        type="hidden"
+                        name="_token"
+                        value="{{ csrf_token('vehicle_return_' ~ reservation.id) }}"
+                    >
+
+                    <label class="form-label fw-semibold">
+                        Vehicle condition
+                    </label>
+
+                    <div class="form-check border rounded p-3 ps-5 mb-2">
+                        <input
+                            class="form-check-input"
+                            type="radio"
+                            name="condition"
+                            id="conditionNone"
+                            value="none"
+                            required
+                        >
+
+                        <label class="form-check-label" for="conditionNone">
+                            <strong>No visible damage</strong>
+                            <span class="d-block small text-secondary">
+                                The vehicle is being returned in good condition.
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="form-check border rounded p-3 ps-5 mb-3">
+                        <input
+                            class="form-check-input"
+                            type="radio"
+                            name="condition"
+                            id="conditionDamage"
+                            value="damage"
+                            required
+                        >
+
+                        <label class="form-check-label" for="conditionDamage">
+                            <strong>Damage or issue to report</strong>
+                            <span class="d-block small text-secondary">
+                                Describe scratches, dents, broken parts, or other issues.
+                            </span>
+                        </label>
+                    </div>
+
+                    <label for="photo" class="form-label fw-semibold">
+                        Vehicle photo (optional)
+                    </label>
+
+                    <input
+                        type="file"
+                        class="form-control mb-2"
+                        id="photo"
+                        name="photo"
+                        accept="image/jpeg,image/png,image/webp"
+                    >
+
+                    <div class="form-text mb-3">
+                        JPG, PNG, or WebP; maximum 5 MB.
+                    </div>
+
+                    <label for="notes" class="form-label fw-semibold">
+                        Remarks / damage description
+                    </label>
+
+                    <textarea
+                        class="form-control mb-4"
+                        id="notes"
+                        name="notes"
+                        rows="4"
+                        placeholder="Describe any damage or add return remarks..."
+                    ></textarea>
+
+                    <div class="alert alert-info small">
+                        Submitting this request does not complete the rental.
+                        An Admin or Staff member must inspect and confirm the return.
+                    </div>
+
+                    <button class="btn btn-primary px-4" type="submit">
+                        Submit return request
+                    </button>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,754 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Account | Torres Vehicle Rental{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --auth-navy: #16324F;
+            --auth-blue: #2E6BE6;
+            --auth-border: #DDE5EF;
+            --auth-muted: #66758A;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            background: #eef3f8;
+        }
+
+        .auth-shell {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: minmax(420px, 1.08fr) minmax(430px, .92fr);
+            background: #fff;
+        }
+
+        /* LEFT SHOWCASE */
+
+        .auth-showcase {
+            position: relative;
+            min-height: 100vh;
+            padding: 46px clamp(34px, 5vw, 76px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            isolation: isolate;
+            color: #fff;
+
+            background:
+                linear-gradient(
+                    120deg,
+                    rgba(13,39,66,.91) 0%,
+                    rgba(22,50,79,.78) 44%,
+                    rgba(31,64,102,.47) 100%
+                ),
+                url('{{ asset('images/background.png') }}') center/cover no-repeat;
+        }
+
+        .auth-showcase::after {
+            content: "";
+            position: absolute;
+            width: 430px;
+            height: 430px;
+            right: -180px;
+            top: -150px;
+            border-radius: 50%;
+            border: 80px solid rgba(255,255,255,.055);
+            z-index: -1;
+        }
+
+        .auth-showcase-copy {
+            max-width: 610px;
+            margin: 60px 0;
+        }
+
+        .auth-kicker {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .auth-kicker img {
+            width: 215px;
+            max-width: 100%;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 3px 8px rgba(0,0,0,.18));
+        }
+
+        .auth-showcase h2 {
+            margin: 0 0 18px;
+            max-width: 12ch;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(2.35rem, 4.8vw, 4.6rem);
+            line-height: 1.04;
+            letter-spacing: -.04em;
+            text-shadow: 0 4px 22px rgba(0,0,0,.18);
+        }
+
+        .auth-showcase-copy > p {
+            max-width: 54ch;
+            margin: 0;
+            color: #E4ECF6;
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .auth-feature-row {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 34px;
+            max-width: 650px;
+        }
+
+        .auth-feature {
+            padding: 15px 16px;
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: 14px;
+            background: rgba(255,255,255,.085);
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-feature strong {
+            display: block;
+            font-size: .84rem;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+
+        .auth-feature span {
+            font-size: .72rem;
+            color: #C9D9EA;
+            line-height: 1.35;
+        }
+
+        .auth-showcase-footer {
+            font-size: .78rem;
+            color: #C7D6E7;
+        }
+
+        /* RIGHT PANEL */
+
+        .auth-main {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 42px clamp(28px, 5vw, 78px);
+
+            background:
+                radial-gradient(
+                    circle at 100% 0%,
+                    rgba(46,107,230,.08),
+                    transparent 30%
+                ),
+                linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 470px;
+        }
+
+        .auth-mobile-logo {
+            display: none;
+        }
+
+        .auth-heading {
+            margin-bottom: 24px;
+        }
+
+        .auth-heading h1 {
+            margin: 0 0 8px;
+            color: var(--auth-navy);
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(1.85rem, 3vw, 2.45rem);
+            letter-spacing: -.035em;
+        }
+
+        .auth-heading p {
+            margin: 0;
+            color: var(--auth-muted);
+            font-size: .94rem;
+        }
+
+        /* TABS */
+
+        .auth-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+            padding: 5px;
+            margin-bottom: 26px;
+            border: 1px solid #E2E8F0;
+            border-radius: 14px;
+            background: #F1F5F9;
+        }
+
+        .auth-tab {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            background: transparent;
+            color: #718096;
+            font: inherit;
+            font-size: .86rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .18s ease;
+        }
+
+        .auth-tab.active {
+            color: var(--auth-navy);
+            background: #fff;
+            box-shadow: 0 3px 10px rgba(22,50,79,.09);
+        }
+
+        /* FORM */
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 0;
+        }
+
+        .auth-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .auth-field > span {
+            color: #26394E;
+            font-size: .82rem;
+            font-weight: 700;
+        }
+
+        .auth-input-wrap {
+            position: relative;
+        }
+
+        .auth-input {
+            width: 100%;
+            height: 50px;
+            padding: 0 46px 0 15px;
+            border: 1px solid var(--auth-border);
+            border-radius: 12px;
+            background: #fff;
+            color: #18283A;
+            font: inherit;
+            font-size: .93rem;
+            transition: border-color .18s ease, box-shadow .18s ease;
+        }
+
+        .auth-input::placeholder {
+            color: #A0ACBA;
+        }
+
+        .auth-input:hover {
+            border-color: #C5D0DE;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--auth-blue);
+            box-shadow: 0 0 0 4px rgba(46,107,230,.10);
+            background: #fff;
+        }
+
+        .auth-field-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: #95A3B5;
+            pointer-events: none;
+        }
+
+        /* PASSWORD TOGGLE */
+
+        .password-toggle {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: #8796A8;
+            cursor: pointer;
+        }
+
+        .password-toggle:hover {
+            background: #F1F5F9;
+            color: var(--auth-navy);
+        }
+
+        .password-toggle svg {
+            width: 18px;
+            height: 18px;
+            pointer-events: none;
+        }
+
+        /* SUBMIT BUTTON */
+
+        .auth-submit {
+            width: 100%;
+            min-height: 50px;
+            margin-top: 3px;
+            border: 0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--auth-blue), #2458C9);
+            color: #fff;
+            font: inherit;
+            font-size: .92rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 24px rgba(46,107,230,.24);
+            transition: transform .16s ease, box-shadow .16s ease;
+        }
+
+        .auth-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 13px 28px rgba(46,107,230,.31);
+        }
+
+        .auth-submit:active {
+            transform: translateY(0);
+        }
+
+        /* ERRORS AND MESSAGES */
+
+        .auth-error {
+            margin: 0 0 18px;
+            padding: 12px 14px;
+            border: 1px solid #F7CBC7;
+            border-left: 4px solid #D94C44;
+            border-radius: 10px;
+            background: #FFF4F2;
+            color: #A93B34;
+            font-size: .84rem;
+            line-height: 1.5;
+        }
+
+        .auth-success {
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            border: 1px solid #B7E4C7;
+            border-left: 4px solid #239B56;
+            border-radius: 10px;
+            background: #F0FFF4;
+            color: #237A45;
+            font-size: .84rem;
+        }
+
+        .auth-error ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .auth-note {
+            margin: 22px 0 0;
+            text-align: center;
+            color: #718096;
+            font-size: .85rem;
+        }
+
+        .auth-note a {
+            color: var(--auth-blue);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .auth-note a:hover {
+            text-decoration: underline;
+        }
+
+        .auth-help {
+            margin-top: 28px;
+            padding-top: 22px;
+            border-top: 1px solid #E8EDF3;
+            color: #8793A2;
+            font-size: .76rem;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 940px) {
+            .auth-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-showcase {
+                display: none;
+            }
+
+            .auth-main {
+                padding: 30px 22px;
+            }
+
+            .auth-card {
+                max-width: 500px;
+            }
+
+            .auth-mobile-logo {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 24px;
+            }
+
+            .auth-mobile-logo img {
+                width: 175px;
+                height: auto;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .auth-main {
+                align-items: flex-start;
+                padding: 24px 18px 34px;
+            }
+
+            .auth-heading h1 {
+                font-size: 1.8rem;
+            }
+
+            .auth-tabs {
+                margin-bottom: 22px;
+            }
+
+            .auth-input {
+                height: 48px;
+            }
+
+            .auth-submit {
+                min-height: 48px;
+            }
+
+            .auth-feature-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+<div class="auth-shell">
+
+    {# LEFT SHOWCASE PANEL #}
+    <section class="auth-showcase" aria-label="Torres Vehicle Rental">
+
+        <div class="auth-showcase-copy">
+
+            <div class="auth-kicker">
+                <img
+                    src="{{ asset('images/logo-cropped.png') }}"
+                    alt="Torres Vehicle Rental logo"
+                >
+            </div>
+
+            <h2>Your journey starts here.</h2>
+
+            <p>
+                Create your account to explore our available fleet,
+                reserve your preferred vehicle, and keep your next trip
+                moving smoothly.
+            </p>
+
+            <div class="auth-feature-row">
+
+                <div class="auth-feature">
+                    <strong>Easy booking</strong>
+                    <span>Reserve vehicles in a few steps.</span>
+                </div>
+
+                <div class="auth-feature">
+                    <strong>Flexible fleet</strong>
+                    <span>Cars, vans, pickups, and motorcycles.</span>
+                </div>
+
+                <div class="auth-feature">
+                    <strong>Easy access</strong>
+                    <span>Manage your bookings in one convenient place.</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="auth-showcase-footer">
+            Reliable rentals for every road ahead.
+        </div>
+
+    </section>
+
+
+    {# RIGHT REGISTRATION PANEL #}
+    <main class="auth-main">
+
+        <div class="auth-card">
+
+            <div class="auth-mobile-logo">
+                <img
+                    src="{{ asset('images/logo-cropped.png') }}"
+                    alt="Torres Vehicle Rental"
+                >
+            </div>
+
+            <div class="auth-heading">
+                <h1>Create your account</h1>
+                <p>
+                    Register as a customer to start reserving vehicles.
+                </p>
+            </div>
+
+
+            {# LOGIN AND REGISTER TABS #}
+            <div class="auth-tabs" role="tablist" aria-label="Account access">
+
+                <a
+                    class="auth-tab"
+                    href="{{ path('app_login') }}"
+                    role="tab"
+                    aria-selected="false"
+                >
+                    Log In
+                </a>
+
+                <a
+                    class="auth-tab active"
+                    href="{{ path('app_register') }}"
+                    role="tab"
+                    aria-selected="true"
+                >
+                    Create Account
+                </a>
+
+            </div>
+
+
+            {# REGISTRATION FORM #}
+
+            {% for message in app.flashes('success') %}
+                <div class="auth-success">{{ message }}</div>
+            {% endfor %}
+
+            {% if errors is not empty %}
+                <div class="auth-error">
+                    <ul>
+                        {% for error in errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <form
+                method="post"
+                action="{{ path('app_register') }}"
+                class="auth-form"
+            >
+
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="{{ csrf_token('register_customer') }}"
+                >
+
+                <label class="auth-field" for="name">
+                    <span>Full Name</span>
+
+                    <div class="auth-input-wrap">
+                        <input
+                            class="auth-input"
+                            type="text"
+                            id="name"
+                            name="name"
+                            value="{{ name }}"
+                            placeholder="Enter your full name"
+                            maxlength="120"
+                            autocomplete="name"
+                            required
+                        >
+                    </div>
+                </label>
+
+
+                <label class="auth-field" for="username">
+                    <span>Username</span>
+
+                    <div class="auth-input-wrap">
+                        <input
+                            class="auth-input"
+                            type="text"
+                            id="username"
+                            name="username"
+                            value="{{ username }}"
+                            placeholder="Choose a username"
+                            maxlength="60"
+                            autocomplete="username"
+                            autocapitalize="none"
+                            spellcheck="false"
+                            required
+                        >
+                    </div>
+                </label>
+
+
+                <label class="auth-field" for="email">
+                    <span>Email Address</span>
+
+                    <div class="auth-input-wrap">
+                        <input
+                            class="auth-input"
+                            type="email"
+                            id="email"
+                            name="email"
+                            value="{{ email }}"
+                            placeholder="Enter your email address"
+                            maxlength="190"
+                            autocomplete="email"
+                            required
+                        >
+                    </div>
+                </label>
+
+
+                <label class="auth-field" for="password">
+                    <span>Password</span>
+
+                    <div class="auth-input-wrap">
+                        <input
+                            class="auth-input"
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="auth-input"
+                            placeholder="Create a password"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            class="password-toggle"
+                            type="button"
+                            data-password-toggle="password"
+                            aria-label="Show password"
+                        >
+                            <svg viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="1.8">
+                                <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/>
+                                <circle cx="12" cy="12" r="2.5"/>
+                            </svg>
+                        </button>
+                    </div>
+                </label>
+
+
+                <label class="auth-field" for="confirm_password">
+                    <span>Confirm Password</span>
+
+                    <div class="auth-input-wrap">
+                        <input
+                            class="auth-input"
+                            type="password"
+                            id="confirm_password"
+                            name="confirm_password"
+                            placeholder="Re-enter your password"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            class="password-toggle"
+                            type="button"
+                            data-password-toggle="confirm_password"
+                            aria-label="Show password"
+                        >
+                            <svg viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="1.8">
+                                <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/>
+                                <circle cx="12" cy="12" r="2.5"/>
+                            </svg>
+                        </button>
+                    </div>
+                </label>
+
+
+                <button type="submit" class="auth-submit">
+                    Create Account
+                </button>
+
+            </form>
+
+
+            <p class="auth-note">
+                Already have an account?
+                <a href="{{ path('app_login') }}">Log in here</a>
+            </p>
+
+            <div class="auth-help">
+                Secure registration for your Torres Vehicle Rental account.
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+    // Show and hide registration passwords
+    document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
+
+        button.addEventListener('click', function () {
+
+            const inputId = button.getAttribute('data-password-toggle');
+            const passwordInput = document.getElementById(inputId);
+
+            const isPassword = passwordInput.type === 'password';
+
+            passwordInput.type = isPassword ? 'text' : 'password';
+
+            button.setAttribute(
+                'aria-label',
+                isPassword ? 'Hide password' : 'Show password'
+            );
+        });
+
+    });
+</script>
+
+{% endblock %}

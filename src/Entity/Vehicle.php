@@ -35,6 +35,15 @@ class Vehicle
     #[ORM\Column(name: 'image_path', length: 255)]
     private ?string $imagePath = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(
+        name: 'created_by_id',
+        referencedColumnName: 'id',
+        nullable: true,
+        onDelete: 'SET NULL'
+    )]
+    private ?User $createdBy = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -103,6 +112,17 @@ class Vehicle
     public function setImagePath(string $imagePath): static
     {
         $this->imagePath = $imagePath;
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
         return $this;
     }
 }

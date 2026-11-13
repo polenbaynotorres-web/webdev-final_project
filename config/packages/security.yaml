@@ -18,6 +18,7 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            user_checker: App\Security\UserChecker
 
             form_login:
                 login_path: app_login
@@ -32,19 +33,24 @@ security:
                 target: app_login
 
     access_control:
-        # Allow everyone to access the login page.
+        # Public pages
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+        - { path: ^/fleet$, roles: PUBLIC_ACCESS }
+        - { path: ^/fleet/[^/]+$, roles: PUBLIC_ACCESS }
         - { path: ^/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/register$, roles: PUBLIC_ACCESS }
+        - { path: ^/contact$, roles: PUBLIC_ACCESS }
 
-        # Admin dashboard.
+        # Admin pages
         - { path: ^/dashboard, roles: ROLE_ADMIN }
 
-        # Staff dashboard.
+        # Staff pages
         - { path: ^/staff, roles: ROLE_STAFF }
 
-        # User dashboard.
+        # Customer pages
         - { path: ^/user, roles: ROLE_USER }
 
-        # Require authentication for all other application routes.
+        # All other application pages require login
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:

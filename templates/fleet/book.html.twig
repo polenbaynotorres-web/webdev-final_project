@@ -1,0 +1,314 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Reserve {{ vehicle.name }}{% endblock %}
+
+{% block stylesheets %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    body {
+        background: #f4f7fb;
+    }
+
+    .booking {
+        max-width: 850px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .booking-card {
+        background: white;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 5px 25px #0f172a0b;
+    }
+
+    .rental-summary {
+        background: #eef6ff;
+        border: 1px solid #cfe2ff;
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .rental-summary .total-days {
+        font-size: 32px;
+        font-weight: 800;
+        color: #0d6efd;
+    }
+
+    .rental-summary .total-price {
+        font-size: 24px;
+        font-weight: 700;
+        color: #198754;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<main class="booking">
+
+    <a href="{{ path('vehicle_details', {slug: vehicle.slug}) }}"
+       class="text-decoration-none">
+        ← Back to vehicle
+    </a>
+
+    <div class="booking-card mt-3">
+
+        <h1 class="h3 fw-bold">Reserve {{ vehicle.name }}</h1>
+
+        <p class="text-secondary">
+            ₱{{ vehicle.price|number_format(2, '.', ',') }} per day
+            · {{ vehicle.seats }} seats
+        </p>
+
+        {% for error in errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+
+        <form method="post">
+
+            <input type="hidden"
+                   name="_token"
+                   value="{{ csrf_token('book_vehicle_' ~ vehicle.id) }}">
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <label class="form-label">Vehicle color</label>
+
+                    <select class="form-select" name="color_id" required>
+                        <option value="">Choose color</option>
+
+                        {% for color in colors %}
+                            <option value="{{ color.id }}"
+                                {{ values.color_id == color.id ? 'selected' : '' }}>
+                                {{ color.colorName }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Contact number</label>
+
+                    <input class="form-control"
+                           name="phone"
+                           value="{{ values.phone }}"
+                           required
+                           maxlength="30">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Pickup date</label>
+
+                    <input class="form-control"
+                           type="date"
+                           id="pickup_date"
+                           name="pickup_date"
+                           min="{{ 'now'|date('Y-m-d') }}"
+                           value="{{ values.pickup_date }}"
+                           required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Pickup time</label>
+
+                    <input class="form-control"
+                           type="time"
+                           name="pickup_time"
+                           value="{{ values.pickup_time }}"
+                           required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Return date</label>
+
+                    <input class="form-control"
+                           type="date"
+                           id="return_date"
+                           name="return_date"
+                           min="{{ 'now'|date('Y-m-d') }}"
+                           value="{{ values.return_date }}"
+                           required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Return time</label>
+
+                    <input class="form-control"
+                           type="time"
+                           name="return_time"
+                           value="{{ values.return_time }}"
+                           required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Pickup location</label>
+
+                    <select class="form-select" name="location_id" required>
+                        <option value="">Choose location</option>
+
+                        {% for location in locations %}
+                            <option value="{{ location.id }}"
+                                {{ values.location_id == location.id ? 'selected' : '' }}>
+                                {{ location.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Payment method</label>
+
+                    <select class="form-select" name="payment_method">
+                        <option value="cash"
+                            {{ values.payment_method == 'cash' ? 'selected' : '' }}>
+                            Cash
+                        </option>
+
+                        <option value="gcash"
+                            {{ values.payment_method == 'gcash' ? 'selected' : '' }}>
+                            GCash
+                        </option>
+
+                        <option value="card"
+                            {{ values.payment_method == 'card' ? 'selected' : '' }}>
+                            Card
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- RENTAL SUMMARY -->
+            <div class="rental-summary mt-4" aria-live="polite">
+
+                <h5 class="fw-bold mb-3">Rental Summary</h5>
+
+                <div class="row align-items-center">
+
+                    <div class="col-6">
+                        <div class="text-secondary small">
+                            Total Rental Days
+                        </div>
+
+                        <div class="total-days" id="total_days">
+                            0 Days
+                        </div>
+                    </div>
+
+                    <div class="col-6 text-end">
+                        <div class="text-secondary small">
+                            Estimated Rental Amount
+                        </div>
+
+                        <div class="total-price" id="total_price">
+                            ₱0.00
+                        </div>
+                    </div>
+
+                </div>
+
+                <p class="small text-secondary mt-3 mb-0" id="rental_message">
+                    Select your pickup and return dates to calculate your rental.
+                </p>
+
+            </div>
+
+            <div class="alert alert-info mt-4 small">
+                Your reservation will be recorded after you submit this form.
+                Please review your pickup and return details before continuing.
+            </div>
+
+            <button class="btn btn-primary btn-lg w-100" type="submit">
+                Submit reservation
+            </button>
+
+        </form>
+
+    </div>
+
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const pickupDate = document.getElementById('pickup_date');
+    const returnDate = document.getElementById('return_date');
+
+    const totalDaysDisplay = document.getElementById('total_days');
+    const totalPriceDisplay = document.getElementById('total_price');
+    const rentalMessage = document.getElementById('rental_message');
+
+    const dailyRate = Number({{ vehicle.price|json_encode|raw }});
+
+    function calculateRental() {
+
+        const pickup = pickupDate.value;
+        const returning = returnDate.value;
+
+        if (!pickup || !returning) {
+            totalDaysDisplay.textContent = '0 Days';
+            totalPriceDisplay.textContent = '₱0.00';
+            rentalMessage.textContent =
+                'Select your pickup and return dates to calculate your rental.';
+            return;
+        }
+
+        const pickupParts = pickup.split('-').map(Number);
+        const returnParts = returning.split('-').map(Number);
+
+        const pickupTimestamp = Date.UTC(
+            pickupParts[0],
+            pickupParts[1] - 1,
+            pickupParts[2]
+        );
+
+        const returnTimestamp = Date.UTC(
+            returnParts[0],
+            returnParts[1] - 1,
+            returnParts[2]
+        );
+
+        if (returnTimestamp < pickupTimestamp) {
+            totalDaysDisplay.textContent = '--';
+            totalPriceDisplay.textContent = '₱0.00';
+            rentalMessage.textContent =
+                'Return date must not be earlier than pickup date.';
+            return;
+        }
+
+        const difference = Math.round(
+            (returnTimestamp - pickupTimestamp) / 86400000
+        );
+
+        const rentalDays = Math.max(1, difference);
+        const totalPrice = rentalDays * dailyRate;
+
+        totalDaysDisplay.textContent =
+            rentalDays + (rentalDays === 1 ? ' Day' : ' Days');
+
+        totalPriceDisplay.textContent =
+            new Intl.NumberFormat('en-PH', {
+                style: 'currency',
+                currency: 'PHP'
+            }).format(totalPrice);
+
+        rentalMessage.textContent =
+            '₱' + dailyRate.toLocaleString('en-PH', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + ' per day × ' + rentalDays + ' rental day(s).';
+    }
+
+    pickupDate.addEventListener('change', calculateRental);
+    returnDate.addEventListener('change', calculateRental);
+
+    calculateRental();
+
+});
+</script>
+
+{% endblock %}

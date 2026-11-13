@@ -1,0 +1,174 @@
+
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Staff Management{% endblock %}
+{% block page_heading %}Staff Management{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-0">
+
+    <div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h3>Staff Management</h3>
+            <p class="text-muted mb-0">
+                View, search, create, update, and manage staff accounts.
+            </p>
+        </div>
+
+        <a href="{{ path('admin_staff_new') }}" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Add Staff
+        </a>
+    </div>
+
+    {% include '_partials/flashes.html.twig' %}
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get"
+                  action="{{ path('admin_staff_index') }}"
+                  class="row g-2 align-items-end">
+
+                <div class="col-md-8">
+                    <label for="search" class="form-label">
+                        Search staff
+                    </label>
+
+                    <input
+                        type="text"
+                        id="search"
+                        name="search"
+                        class="form-control"
+                        placeholder="Name, username or email"
+                        value="{{ search|default('') }}"
+                    >
+                </div>
+
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        Search
+                    </button>
+
+                    <a href="{{ path('admin_staff_index') }}"
+                       class="btn btn-outline-secondary">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Name</th>
+                            <th>Username / Email</th>
+                            <th>Status</th>
+                            <th>Date Created</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for staff in staffMembers %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+
+                            <td>{{ staff.name }}</td>
+
+                            <td>
+                                {{ staff.username ?? '—' }}
+                                <div class="small text-muted">
+                                    {{ staff.email ?? '—' }}
+                                </div>
+                            </td>
+
+                            <td>
+                                {% if staff.isActive %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Disabled</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ staff.createdAt
+                                    ? staff.createdAt|date('M d, Y')
+                                    : '—' }}
+                            </td>
+
+                            <td class="text-end text-nowrap">
+
+                                <a href="{{ path('admin_staff_edit', {id: staff.id}) }}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Edit
+                                </a>
+
+                                <form
+                                    method="post"
+                                    action="{{ path('admin_staff_status', {id: staff.id}) }}"
+                                    class="d-inline"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="_token"
+                                        value="{{ csrf_token('staff_status_' ~ staff.id) }}"
+                                    >
+
+                                    {% if staff.isActive %}
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-warning"
+                                                onclick="return confirm('Disable this staff account?');">
+                                            Disable
+                                        </button>
+                                    {% else %}
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-success"
+                                                onclick="return confirm('Enable this staff account?');">
+                                            Enable
+                                        </button>
+                                    {% endif %}
+                                </form>
+
+                                <form
+                                    method="post"
+                                    action="{{ path('admin_staff_delete', {id: staff.id}) }}"
+                                    class="d-inline"
+                                    onsubmit="return confirm('Delete this staff account?');"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="_token"
+                                        value="{{ csrf_token('staff_delete_' ~ staff.id) }}"
+                                    >
+
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-danger">
+                                        Delete
+                                    </button>
+                                </form>
+
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                No staff accounts found.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

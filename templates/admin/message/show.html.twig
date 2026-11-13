@@ -1,0 +1,25 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %}Message{% endblock %}
+{% block page_heading %}Message{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-0">
+    <a href="{{ path('admin_message_index') }}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Back to messages</a>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h4 class="mb-1">{{ message.subject }}</h4>
+            <p class="text-muted">
+                From {{ message.name }} &lt;{{ message.email }}&gt; &middot; {{ message.createdAt|date('F d, Y h:i A') }}
+                {% if message.user %}&middot; registered customer{% endif %}
+            </p>
+            <div class="border rounded p-3 bg-light mb-3">{{ message.message|nl2br }}</div>
+            <a href="mailto:{{ message.email }}?subject={{ ('Re: ' ~ message.subject)|url_encode }}" class="btn btn-primary">Reply by email</a>
+            <form method="post" action="{{ path('admin_message_delete', {id: message.id}) }}" class="d-inline"
+                  onsubmit="return confirm('Delete this message?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('message_delete_' ~ message.id) }}">
+                <button type="submit" class="btn btn-outline-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

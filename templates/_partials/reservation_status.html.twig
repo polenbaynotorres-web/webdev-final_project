@@ -1,0 +1,9 @@
+{# Usage: include '_partials/reservation_status.html.twig' with {status: reservation.status} #}
+{% set statusMap = {
+    'confirmed': ['bg-success', 'Confirmed'],
+    'return_pending': ['bg-warning text-dark', 'Return Pending'],
+    'returned': ['bg-primary', 'Returned'],
+    'cancelled': ['bg-danger', 'Cancelled']
+} %}
+{% set statusInfo = statusMap[status] ?? ['bg-secondary', status|capitalize] %}
+<span class="badge {{ statusInfo[0] }}">{{ statusInfo[1] }}</span>

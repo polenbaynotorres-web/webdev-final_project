@@ -1,0 +1,829 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Torres Vehicle Rental | Rentals Built for the Whole Journey{% endblock %}
+
+{% block stylesheets %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --navy: #16324F;
+    --navy2: #1F4066;
+    --blue: #2E6BE6;
+    --blue-light: #EAF1FE;
+    --gold: #F5A524;
+    --ink: #1B2430;
+    --muted: #687586;
+    --mist: #F6F8FB;
+    --border: #E4E9F0;
+    --radius: 16px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    background: #fff;
+}
+
+h1, h2, h3, h4, .navbar-brand {
+    font-family: 'Poppins', sans-serif;
+}
+
+a { text-decoration: none; }
+
+/* NAVIGATION */
+.site-header {
+    background: #fff;
+    box-shadow: 0 3px 18px rgba(22,50,79,.07);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.site-header .navbar {
+    min-height: 82px;
+}
+
+.brand-logo {
+    width: 170px;
+    max-height: 58px;
+    object-fit: contain;
+}
+
+.navbar-nav .nav-link {
+    color: var(--navy);
+    font-size: .9rem;
+    font-weight: 600;
+    padding: 12px 13px !important;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--blue);
+}
+
+.btn-primary {
+    background: var(--blue);
+    border-color: var(--blue);
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 11px 22px;
+}
+
+.btn-primary:hover {
+    background: #1F4EC2;
+    border-color: #1F4EC2;
+}
+
+.btn-outline-primary {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 10px 20px;
+}
+
+/* HERO */
+.hero {
+    min-height: 590px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    color: white;
+    background:
+        linear-gradient(90deg, rgba(12,34,57,.94), rgba(12,34,57,.72), rgba(12,34,57,.25)),
+        url('{{ asset('images/background.png') }}') center/cover no-repeat;
+}
+
+.hero-content {
+    max-width: 1180px;
+    width: 100%;
+    margin: auto;
+    padding: 90px 24px;
+}
+
+.hero-eyebrow {
+    display: inline-block;
+    color: #BFD3F5;
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.hero h1 {
+    max-width: 780px;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.12;
+    margin-bottom: 24px;
+}
+
+.hero-copy {
+    max-width: 650px;
+    color: #E0EAF8;
+    font-size: 1.08rem;
+    line-height: 1.85;
+    margin-bottom: 32px;
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 13px;
+}
+
+.btn-hero {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255,255,255,.8);
+    border-radius: 8px;
+    padding: 13px 26px;
+    font-weight: 700;
+}
+
+.btn-hero:hover {
+    background: white;
+    color: var(--navy);
+}
+
+/* GENERAL SECTIONS */
+.section-pad {
+    padding: 85px 0;
+}
+
+.section-heading {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 48px;
+}
+
+.section-heading .eyebrow {
+    color: var(--blue);
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: .78rem;
+    font-weight: 800;
+}
+
+.section-heading h2 {
+    color: var(--navy);
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 800;
+    margin: 12px 0;
+}
+
+.section-heading p {
+    color: var(--muted);
+    line-height: 1.8;
+}
+
+/* FLEET */
+.fleet-section {
+    background: var(--mist);
+}
+
+.vehicle-card {
+    height: 100%;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(22,50,79,.05);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.vehicle-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 30px rgba(22,50,79,.12);
+}
+
+.vehicle-photo {
+    height: 225px;
+    padding: 15px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vehicle-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.vehicle-info {
+    padding: 23px;
+}
+
+.vehicle-info h3 {
+    color: var(--navy);
+    font-size: 1.12rem;
+    font-weight: 700;
+}
+
+.vehicle-meta {
+    color: var(--muted);
+    font-size: .86rem;
+    margin: 10px 0 17px;
+}
+
+.vehicle-price {
+    color: var(--blue);
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.vehicle-price small {
+    color: var(--muted);
+    font-size: .8rem;
+    font-weight: 400;
+}
+
+.vehicle-card .btn {
+    width: 100%;
+    margin-top: 16px;
+}
+
+.section-action {
+    text-align: center;
+    margin-top: 40px;
+}
+
+/* WHY US */
+.why-section {
+    background: var(--navy);
+    color: white;
+}
+
+.why-section .section-heading h2 {
+    color: white;
+}
+
+.why-section .section-heading p {
+    color: #BFD3F5;
+}
+
+.feature-card {
+    height: 100%;
+    padding: 28px 24px;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: var(--radius);
+    background: rgba(255,255,255,.06);
+}
+
+.feature-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(46,107,230,.25);
+    color: #91B6FF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.45rem;
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.feature-card p {
+    color: #BFD3F5;
+    font-size: .9rem;
+    line-height: 1.75;
+    margin: 0;
+}
+
+/* HOW IT WORKS */
+.steps-section {
+    background: #fff;
+}
+
+.step-card {
+    text-align: center;
+    padding: 20px 15px;
+    height: 100%;
+}
+
+.step-number {
+    width: 65px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    background: var(--blue-light);
+    color: var(--blue);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+}
+
+.step-card h3 {
+    color: var(--navy);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.step-card p {
+    color: var(--muted);
+    font-size: .88rem;
+    line-height: 1.75;
+}
+
+/* REVIEWS */
+.reviews-section {
+    background: var(--mist);
+}
+
+.review-card {
+    height: 100%;
+    background: white;
+    padding: 28px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 5px 20px rgba(22,50,79,.04);
+}
+
+.review-stars {
+    color: var(--gold);
+    letter-spacing: 3px;
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+}
+
+.review-quote {
+    color: #485568;
+    font-size: .92rem;
+    line-height: 1.8;
+    min-height: 105px;
+}
+
+.review-person {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.review-avatar {
+    width: 43px;
+    height: 43px;
+    border-radius: 50%;
+    background: var(--blue-light);
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+
+.review-person strong {
+    display: block;
+    color: var(--navy);
+    font-size: .9rem;
+}
+
+.review-person small {
+    color: var(--muted);
+}
+
+/* CONTACT */
+.contact-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 390px;
+    background: var(--navy);
+}
+
+.contact-info {
+    padding: 70px max(30px, calc((100vw - 1180px)/2));
+    color: white;
+}
+
+.contact-info h2 {
+    font-size: 2.3rem;
+    font-weight: 800;
+    margin-bottom: 18px;
+}
+
+.contact-info p {
+    color: #BFD3F5;
+    line-height: 1.8;
+    max-width: 480px;
+}
+
+.contact-map {
+    min-height: 390px;
+}
+
+.contact-map iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 390px;
+    border: 0;
+}
+
+/* FOOTER */
+.site-footer {
+    background: #10263D;
+    color: #BFD3F5;
+    padding-top: 60px;
+}
+
+.footer-brand img {
+    width: 155px;
+    max-height: 65px;
+    object-fit: contain;
+    object-position: left;
+    margin-bottom: 18px;
+    background: white;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+.footer-brand p {
+    font-size: .88rem;
+    line-height: 1.8;
+    max-width: 280px;
+}
+
+.footer-col h4 {
+    color: white;
+    font-size: .95rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.footer-col a {
+    display: block;
+    color: #BFD3F5;
+    font-size: .87rem;
+    margin-bottom: 12px;
+}
+
+.footer-col a:hover {
+    color: white;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,.12);
+    margin-top: 45px;
+    padding: 20px 0;
+    text-align: center;
+    font-size: .82rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 767px) {
+    .hero {
+        min-height: 520px;
+        background-position: 60% center;
+    }
+
+    .hero-content {
+        padding: 70px 22px;
+    }
+
+    .section-pad {
+        padding: 65px 0;
+    }
+
+    .vehicle-photo {
+        height: 205px;
+    }
+
+    .contact-section {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-info {
+        padding: 55px 25px;
+    }
+
+    .contact-map,
+    .contact-map iframe {
+        min-height: 300px;
+    }
+
+    .review-quote {
+        min-height: auto;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+{# ================= NAVIGATION ================= #}
+<header class="site-header">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{{ path('app_home') }}">
+                <img class="brand-logo"
+                     src="{{ asset('images/logo-cropped.png') }}"
+                     alt="Torres Vehicle Rental">
+            </a>
+
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <div class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                    <a class="nav-link" href="{{ path('app_home') }}">Home</a>
+                    <a class="nav-link" href="{{ path('fleet_index') }}">Fleet</a>
+                    <a class="nav-link" href="#why-us">Why Us</a>
+                    <a class="nav-link" href="#how-it-works">How It Works</a>
+                    <a class="nav-link" href="#reviews">Reviews</a>
+                    <a class="nav-link" href="#contact">Contact</a>
+
+                    {% if app.user %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a class="nav-link" href="{{ path('admin_dashboard') }}">Dashboard</a>
+                        {% elseif is_granted('ROLE_STAFF') %}
+                            <a class="nav-link" href="{{ path('staff_dashboard') }}">Dashboard</a>
+                        {% else %}
+                            <a class="nav-link" href="{{ path('user_dashboard') }}">My Dashboard</a>
+                        {% endif %}
+
+                        <form method="post" action="{{ path('app_logout') }}" class="ms-lg-2">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                            <button class="btn btn-outline-primary btn-sm" type="submit">Logout</button>
+                        </form>
+                    {% else %}
+                        <a class="nav-link" href="{{ path('app_login') }}">Login</a>
+                        <a class="btn btn-primary btn-sm ms-lg-2" href="{{ path('app_register') }}">Create Account</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+{# ================= HERO ================= #}
+<section class="hero" id="home">
+    <div class="hero-content">
+        <span class="hero-eyebrow">Your Safety Is Our Priority</span>
+
+        <h1>Rentals built for<br>the whole journey.</h1>
+
+        <p class="hero-copy">
+            Torres Vehicle Rental keeps business travel, family road trips,
+            and daily commutes smooth and effortless with a modern fleet
+            and a rental process you can trust.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{{ path('fleet_index') }}" class="btn btn-hero btn-lg">
+                View The Fleet
+            </a>
+
+            {% if not app.user %}
+                <a href="{{ path('app_register') }}" class="btn btn-primary btn-lg">
+                    Create an Account
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{# ================= FLEET ================= #}
+<section class="fleet-section section-pad" id="fleet">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">Our Vehicles</span>
+            <h2>Explore Our Fleet</h2>
+            <p>Well-maintained, reliable, and ready for your next journey.</p>
+        </div>
+
+        <div class="row g-4">
+            {% for vehicle in featuredVehicles %}
+                <div class="col-md-6 col-lg-3">
+                    <article class="vehicle-card">
+                        {% set imageFilename = vehicle.imagePath|split('/')|last %}
+                        <div class="vehicle-photo">
+                            <img
+                                src="{{ vehicle.imagePath starts with 'uploads/' ? asset(vehicle.imagePath) : asset('images/' ~ imageFilename) }}"
+                                alt="{{ vehicle.name }}"
+                                loading="lazy">
+                        </div>
+
+                        <div class="vehicle-info">
+                            <h3>{{ vehicle.name }}</h3>
+
+                            <p class="vehicle-meta">
+                                {{ vehicle.seats }} Seats
+                                &nbsp;&middot;&nbsp;
+                                {{ vehicle.vehicleClass|replace({'-':' '})|title }}
+                            </p>
+
+                            <div class="vehicle-price">
+                                &#8369;{{ vehicle.price|number_format(2, '.', ',') }}
+                                <small>/ day</small>
+                            </div>
+
+                            <a class="btn btn-outline-primary"
+                               href="{{ path('vehicle_details', {slug: vehicle.slug}) }}">
+                                View Details
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            {% else %}
+                <div class="col-12 text-center py-4">
+                    <p class="text-secondary">Vehicles will be listed here soon.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="section-action">
+            <a href="{{ path('fleet_index') }}" class="btn btn-primary">
+                View All Vehicles
+            </a>
+        </div>
+    </div>
+</section>
+
+{# ================= WHY RENT WITH TORRES ================= #}
+<section class="why-section section-pad" id="why-us">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow text-info">Why Choose Us</span>
+            <h2>Why Rent With Torres</h2>
+            <p>Transparent service. Reliable vehicles. Peace of mind.</p>
+        </div>
+
+        <div class="row g-4">
+            {% set features = [
+                {icon: '$', title: 'No Hidden Fees', description: 'What you see is what you pay. All-in pricing, always.'},
+                {icon: 'C', title: 'Flexible Cancellation', description: 'Cancellation options are handled according to your reservation terms.'},
+                {icon: 'P', title: 'Convenient Pick-Up', description: 'A straightforward pick-up process helps you start your journey.'},
+                {icon: 'T', title: 'Travel with Confidence', description: 'Choose a vehicle suited to your travel needs.'},
+                {icon: 'B', title: 'Clear Booking Details', description: 'Review your reservation details and booking information.'},
+                {icon: 'S', title: 'Customer Support', description: 'Our team is here to help with your rental questions.'}
+            ] %}
+
+            {% for feature in features %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">{{ feature.icon }}</div>
+                        <h3>{{ feature.title }}</h3>
+                        <p>{{ feature.description }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ================= HOW IT WORKS ================= #}
+<section class="steps-section section-pad" id="how-it-works">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">Simple Process</span>
+            <h2>How It Works</h2>
+            <p>Renting a vehicle is quick and easy.</p>
+        </div>
+
+        <div class="row g-4">
+            {% set steps = [
+                {number: '01', title: 'Choose Your Vehicle', description: 'Browse our fleet and select the perfect ride for you.'},
+                {number: '02', title: 'Pick Your Date', description: 'Select your pick-up and return dates and times.'},
+                {number: '03', title: 'Confirm Booking', description: 'Review your reservation details before submitting.'},
+                {number: '04', title: 'Pick-Up & Drive', description: 'Pick up your vehicle and enjoy your journey.'}
+            ] %}
+
+            {% for step in steps %}
+                <div class="col-md-6 col-lg-3">
+                    <div class="step-card">
+                        <div class="step-number">{{ step.number }}</div>
+                        <h3>{{ step.title }}</h3>
+                        <p>{{ step.description }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ================= CUSTOMER REVIEWS ================= #}
+<section class="reviews-section section-pad" id="reviews">
+    <div class="container">
+        <div class="section-heading">
+            <span class="eyebrow">Testimonials</span>
+            <h2>What Our Customers Say</h2>
+            <p>Discover what makes the rental experience with Torres special.</p>
+        </div>
+
+        <div class="row g-4">
+            {% set testimonials = [
+                {name: 'Jessica Reyes', role: 'Family Traveler', rating:5, quote: 'Torres made our family trip completely stress-free. The car was clean and the staff were amazing.'},
+                {name: 'Marcus Feld', role: 'Business Traveler', rating:5, quote: 'Booking was easy and transparent. The vehicle was exactly what we expected.'},
+                {name: 'Anna Dela Cruz', role: 'Road Tripper', rating: 5, quote: 'Great service from start to finish. The experience gave us peace of mind on the road.'}
+            ] %}
+
+            {% for review in testimonials %}
+                <div class="col-md-6 col-lg-4">
+                    <article class="review-card">
+                        <div class="review-stars" aria-label="{{ review.rating }} out of 5 stars">
+                            {% for i in 1..review.rating %}&#9733;{% endfor %}
+                        </div>
+                        <p class="review-quote">&ldquo;{{ review.quote }}&rdquo;</p>
+
+                        <div class="review-person">
+                            <div class="review-avatar">{{ review.name|slice(0, 1) }}</div>
+                            <div>
+                                <strong>{{ review.name }}</strong>
+                                <small>{{ review.role }}</small>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{# ================= CONTACT ================= #}
+<section class="contact-section" id="contact">
+    <div class="contact-info">
+        <span class="hero-eyebrow">Visit Us</span>
+        <h2>Find Torres Near You</h2>
+        <p>
+            Visit Torres Vehicle Rental in Dumaguete City, Negros Oriental.
+            Contact our team for assistance with your vehicle rental.
+        </p>
+        <p><strong>Location:</strong> Larena Drive, Dumaguete City, Negros Oriental</p>
+        <a href="{{ path('fleet_index') }}" class="btn btn-primary">Explore Our Fleet</a>
+    </div>
+    <div class="contact-map">
+        <iframe
+            src="https://www.google.com/maps?q=Larena+Drive,+Dumaguete+City,+Negros+Oriental&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Torres Vehicle Rental location map">
+        </iframe>
+    </div>
+</section>
+
+{# ================= FOOTER ================= #}
+<footer class="site-footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-5 footer-brand">
+                <img src="{{ asset('images/logo-cropped.png') }}" alt="Torres Vehicle Rental">
+                <p>Reliable vehicles and a straightforward rental experience for every journey.</p>
+            </div>
+
+            <div class="col-6 col-md-3 footer-col">
+                <h4>Quick Links</h4>
+                <a href="{{ path('app_home') }}">Home</a>
+                <a href="{{ path('fleet_index') }}">Our Fleet</a>
+                <a href="#why-us">Why Choose Us</a>
+                <a href="#how-it-works">How It Works</a>
+            </div>
+
+            <div class="col-6 col-md-4 footer-col">
+                <h4>Account</h4>
+                {% if app.user %}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin_dashboard') }}">Dashboard</a>
+                    {% elseif is_granted('ROLE_STAFF') %}
+                        <a href="{{ path('staff_dashboard') }}">Dashboard</a>
+                    {% else %}
+                        <a href="{{ path('user_dashboard') }}">My Dashboard</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ path('app_login') }}">Login</a>
+                    <a href="{{ path('app_register') }}">Create Account</a>
+                {% endif %}
+                <a href="#contact">Contact Us</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            &copy; {{ "now"|date("Y") }} Torres Vehicle Rental. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

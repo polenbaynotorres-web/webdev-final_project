@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Torres Vehicle Rental{% endblock %} | Torres Vehicle Rental</title>
+    <link rel="icon" href="{{ asset('images/logo-icon.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/css/customer.css') }}">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="customer-body">
+{% set route = app.request.attributes.get('_route') %}
+<nav class="navbar navbar-expand-lg customer-nav" data-bs-theme="dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ path('app_home') }}">
+            <img src="{{ asset('images/logo-cropped.png') }}" alt="Torres Vehicle Rental">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#customerNav" aria-controls="customerNav"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="customerNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link {{ route == 'home' ? 'active' }}" href="{{ path('app_home') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link {{ route starts with 'fleet_' ? 'active' }}" href="{{ path('fleet_index') }}">Fleet</a></li>
+                <li class="nav-item"><a class="nav-link {{ route == 'contact' ? 'active' }}" href="{{ path('contact') }}">Contact</a></li>
+                {# Role-based menu #}
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('admin_dashboard') }}">Admin Dashboard</a></li>
+                {% elseif is_granted('ROLE_STAFF') %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('staff_dashboard') }}">Staff Dashboard</a></li>
+                {% elseif is_granted('ROLE_USER') %}
+                    <li class="nav-item"><a class="nav-link {{ route starts with 'user_' ? 'active' }}" href="{{ path('user_reservation_index') }}">My Reservations</a></li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                {% if app.user %}
+                    <li class="nav-item"><a class="nav-link {{ route starts with 'account_' ? 'active' }}" href="{{ path('account_profile') }}">{{ app.user.name }}</a></li>
+                    <li class="nav-item">
+                        <form method="post" action="{{ path('app_logout') }}" class="d-inline">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                            <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Login</a></li>
+                    <li class="nav-item"><a class="btn btn-tv btn-sm" href="{{ path('app_register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="customer-main">
+    {% block hero %}{% endblock %}
+    <div class="container py-4 py-lg-5">
+        {% include '_partials/flashes.html.twig' %}
+        {% block body %}{% endblock %}
+    </div>
+</main>
+
+<footer class="customer-footer py-4 mt-auto">
+    <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+        <span>&copy; {{ 'now'|date('Y') }} Torres Vehicle Rental. All rights reserved.</span>
+        <span><a class="link-light text-decoration-none" href="{{ path('contact') }}">Contact us</a></span>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+{% block javascripts %}{% endblock %}
+</body>
+</html>

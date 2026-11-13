@@ -2,6 +2,7 @@
 
 namespace App\Controller\Manage;
 
+use App\Entity\User;
 use App\Entity\Vehicle;
 use App\Form\VehicleType;
 use App\Repository\VehicleRepository;
@@ -11,15 +12,59 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/manage/vehicles', name: 'vehicle_')]
-#[IsGranted('ROLE_STAFF')]
-class VehicleController extends AbstractController
+final class VehicleController extends AbstractController
 {
-    #[Route('', name: 'index', methods: ['GET'])]
-    public function index(VehicleRepository $vehicleRepository): Response
+    /**
+     * Only Admin and Staff accounts can manage vehicles.
+     */
+    private function denyUnlessVehicleManager(): User
     {
+        $user = $this->getUser();
+
+        if (
+            !$user instanceof User ||
+            !in_array($user->getRole(), [
+                User::ROLE_ADMIN,
+                User::ROLE_STAFF,
+            ], true)
+        ) {
+            throw $this->createAccessDeniedException(
+                'Only Admin and Staff accounts can manage vehicles.'
+            );
+        }
+
+        return $user;
+    }
+
+    /**
+     * Staff may edit or delete only vehicles they created.
+     * Admins may manage every vehicle.
+     */
+    private function denyUnlessOwnerOrAdmin(
+        Vehicle $vehicle,
+        User $user
+    ): void {
+        if ($user->getRole() === User::ROLE_ADMIN) {
+            return;
+        }
+
+        if (
+            $vehicle->getCreatedBy()?->getId() !== $user->getId()
+        ) {
+            throw $this->createAccessDeniedException(
+                'You can only manage vehicles that you created.'
+            );
+        }
+    }
+
+    #[Route('', name: 'index', methods: ['GET'])]
+    public function index(
+        VehicleRepository $vehicleRepository
+    ): Response {
+        $this->denyUnlessVehicleManager();
+
         return $this->render('manage/vehicle/index.html.twig', [
             'vehicles' => $vehicleRepository->findBy([], ['name' => 'ASC']),
         ]);
@@ -30,6 +75,8 @@ class VehicleController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager
     ): Response {
+        $user = $this->denyUnlessVehicleManager();
+
         $vehicle = new Vehicle();
 
         $form = $this->createForm(VehicleType::class, $vehicle, [
@@ -47,6 +94,9 @@ class VehicleController extends AbstractController
                     $this->uploadVehicleImage($imageFile)
                 );
 
+                // Record the staff/admin account that created this vehicle.
+                $vehicle->setCreatedBy($user);
+
                 $entityManager->persist($vehicle);
                 $entityManager->flush();
 
@@ -61,12 +111,21 @@ class VehicleController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
+    #[Route(
+        '/{id}/edit',
+        name: 'edit',
+        requirements: ['id' => '\d+'],
+        methods: ['GET', 'POST']
+    )]
     public function edit(
         Vehicle $vehicle,
         Request $request,
         EntityManagerInterface $entityManager
     ): Response {
+        $user = $this->denyUnlessVehicleManager();
+
+        $this->denyUnlessOwnerOrAdmin($vehicle, $user);
+
         $form = $this->createForm(VehicleType::class, $vehicle, [
             'is_edit' => true,
         ]);
@@ -96,15 +155,24 @@ class VehicleController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
+    #[Route(
+        '/{id}/delete',
+        name: 'delete',
+        requirements: ['id' => '\d+'],
+        methods: ['POST']
+    )]
     public function delete(
         Vehicle $vehicle,
         Request $request,
         EntityManagerInterface $entityManager
     ): Response {
+        $user = $this->denyUnlessVehicleManager();
+
+        $this->denyUnlessOwnerOrAdmin($vehicle, $user);
+
         if (!$this->isCsrfTokenValid(
-            'delete_vehicle_'.$vehicle->getId(),
-            $request->request->get('_token')
+            'delete_vehicle_' . $vehicle->getId(),
+            $request->request->getString('_token')
         )) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }

@@ -1,0 +1,165 @@
+
+{% extends layout %}
+
+{% block title %}My Profile{% endblock %}
+{% block page_heading %}My Profile{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-0">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <h2 class="h4 mb-1">My Account</h2>
+            <p class="text-muted mb-0">
+                View and update your account information.
+            </p>
+        </div>
+
+        <a href="{{ path('account_password') }}"
+           class="btn btn-outline-primary">
+            Change password
+        </a>
+    </div>
+
+    {% include '_partials/flashes.html.twig' %}
+    {% include '_partials/errors.html.twig' %}
+
+    <div class="row g-4">
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="mb-3">Account details</h5>
+
+                    <p class="mb-2">
+                        <strong>Username:</strong>
+                        {{ account.username ?? '—' }}
+                    </p>
+
+                    <p class="mb-2">
+                        <strong>Role:</strong>
+                        {{ account.role|capitalize }}
+                    </p>
+
+                    <p class="mb-2">
+                        <strong>Status:</strong>
+                        {{ account.status|capitalize }}
+                    </p>
+
+                    <p class="mb-0">
+                        <strong>Member since:</strong>
+                        {{ account.createdAt
+                            ? account.createdAt|date('F d, Y')
+                            : '—' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="mb-3">Edit profile</h5>
+
+                    <form method="post"
+                          action="{{ path('account_profile') }}"
+                          novalidate>
+
+                        <input
+                            type="hidden"
+                            name="_token"
+                            value="{{ csrf_token('account_profile') }}"
+                        >
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">
+                                Full name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                class="form-control"
+                                maxlength="120"
+                                required
+                                value="{{ name }}"
+                            >
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-control"
+                                maxlength="190"
+                                required
+                                value="{{ email }}"
+                            >
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {% if account.role == 'user' %}
+        <div class="card border-danger shadow-sm mt-4">
+            <div class="card-body">
+
+                <h5 class="text-danger mb-2">Danger Zone</h5>
+
+                <p class="text-muted">
+                    Deleting your account will prevent you from logging in.
+                    Your reservation history and related records will be retained.
+                    This action cannot be undone through this page.
+                </p>
+
+                <form
+                    method="post"
+                    action="{{ path('account_delete') }}"
+                    onsubmit="return confirm('Are you sure you want to delete your account? You will no longer be able to log in.');"
+                >
+                    <input
+                        type="hidden"
+                        name="_token"
+                        value="{{ csrf_token('account_delete') }}"
+                    >
+
+                    <div class="mb-3">
+                        <label for="delete_current_password"
+                               class="form-label">
+                            Enter your current password to confirm
+                        </label>
+
+                        <input
+                            type="password"
+                            id="delete_current_password"
+                            name="current_password"
+                            class="form-control"
+                            required
+                            autocomplete="current-password"
+                        >
+                    </div>
+
+                    <button type="submit" class="btn btn-danger">
+                        Delete My Account
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

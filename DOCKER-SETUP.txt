@@ -1,99 +1,59 @@
 # TORRES VEHICLE RENTAL - DOCKER SETUP
 
-## Docker Environment
+## Requirements
 
-This setup runs the Symfony project using:
+- Windows 10/11
+- Docker Desktop with Docker Compose
+- PowerShell
 
-- Symfony / PHP with Apache
-- MySQL 8.0
-- phpMyAdmin
+## Services and URLs
 
-## Access URLs
-
-- Symfony application: http://localhost:8000
-- phpMyAdmin: http://localhost:8081
+- Symfony application: http://127.0.0.1:8000
+- phpMyAdmin: http://127.0.0.1:8081
 - MySQL from Windows: 127.0.0.1:3308
 
-## Docker Services
+Container names: `torres_symfony_app`, `torres_mysql`, and `torres_phpmyadmin`.
 
-- App container: `torres_symfony_app`
-- MySQL container: `torres_mysql`
-- phpMyAdmin container: `torres_phpmyadmin`
+## Start the application
 
-## Starting the Project
+Open PowerShell in the folder containing `compose.yaml` and run:
 
-Open PowerShell in the Symfony project root:
+```powershell
+docker compose config
+docker compose up -d --build
+docker compose ps
+docker compose logs -f app
+```
 
-    docker compose config
-    docker compose up -d --build
+The included `.env` values are local development examples only. Change the database passwords and APP_SECRET before exposing the system to a public network. Do not use sample credentials for a public deployment.
 
-Check running containers:
+## Existing database
 
-    docker compose ps
+The database name is `torres_rental`. Docker stores data in the persistent volume `torres_mysql_data`.
 
-View application logs:
+If you already have your `torres_rental` database on Windows MySQL, you can continue using that database instead of importing a new copy. Configure the Symfony `DATABASE_URL` for the environment where PHP runs:
 
-    docker compose logs -f app
+- Inside Docker: hostname `database`, port `3306`.
+- From Windows: host `127.0.0.1`, port `3308` when using the Compose MySQL service, or your local MySQL port if using a separate server.
 
-## phpMyAdmin Login
+Back up your existing database before applying migrations. Review the migration files in `migrations/` and run `php bin/console doctrine:migrations:status` and `php bin/console doctrine:migrations:migrate --dry-run` before applying them. Never run `doctrine:schema:drop` on a database containing data you need.
 
-- Server: `database`
-- Username: `torres_app`
-- Password: Use the local `.env` file.
+This distributable project intentionally does not include SQL dumps or private database backups. Import no SQL file unless you are deliberately initializing an empty database and have verified the SQL contents.
 
-## Database Configuration
+## Useful commands
 
-- Database: `torres_rental`
-- MySQL container hostname: `database`
-- MySQL container port: `3306`
-- Windows host port: `3308`
+```powershell
+docker compose start
+docker compose stop
+docker compose ps
+docker compose logs -f app
+docker compose down
+```
 
-Database credentials are stored in the local `.env` file and must not be committed to GitHub.
+`docker compose down` preserves the named MySQL volume. Do not use `docker compose down -v` unless you intentionally want to delete the database volume and all data stored in it.
 
-## Database Import
+## phpMyAdmin
 
-The original project archive contains:
+Open http://127.0.0.1:8081. The server is `database`; the username and password are the local values configured in `.env`.
 
-    database/schema.sql
-
-The SQL file may contain commands that drop and recreate the `torres_rental` database.
-
-Import it only when initializing an empty database. Do not import it into a database containing records that must be preserved.
-
-The Docker database uses a persistent volume:
-
-    torres_mysql_data
-
-Do not delete this volume unless you intentionally want to remove the stored database data.
-
-## Useful Docker Commands
-
-Start containers:
-
-    docker compose start
-
-Stop containers:
-
-    docker compose stop
-
-View container status:
-
-    docker compose ps
-
-View application logs:
-
-    docker compose logs -f app
-
-Stop and remove containers without deleting database data:
-
-    docker compose down
-
-IMPORTANT:
-Never run `docker compose down -v` unless you intentionally want to delete the persistent MySQL database volume.
-
-## Important Notes
-
-- Keep `.env` private and excluded from Git.
-- Do not commit passwords, API keys, or production secrets.
-- Use the Docker hostname `database` and port `3306` for connections from inside containers.
-- Use `127.0.0.1:3308` for MySQL connections from Windows.
+Keep phpMyAdmin private. Do not expose its port through ngrok.

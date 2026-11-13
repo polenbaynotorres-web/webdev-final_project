@@ -1,0 +1,40 @@
+{% extends 'admin/base.html.twig' %}
+{% block title %}Edit Customer{% endblock %}
+{% block page_heading %}Edit Customer{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-0">
+    <div class="row">
+        <div class="col-lg-7">
+            <a href="{{ path('admin_customer_index') }}" class="btn btn-outline-secondary btn-sm mb-3">&larr; Back to customers</a>
+            <h3 class="mb-3">Edit customer #{{ customer.id }}</h3>
+            {% include '_partials/errors.html.twig' %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="post" action="{{ path('admin_customer_edit', {id: customer.id}) }}" novalidate>
+                        <input type="hidden" name="_token" value="{{ csrf_token('customer_edit_' ~ customer.id) }}">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Full name</label>
+                            <input type="text" id="name" name="name" class="form-control" maxlength="120" required value="{{ customer.name }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" id="username" name="username" class="form-control" maxlength="60" required value="{{ customer.username }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" name="email" class="form-control" maxlength="190" required value="{{ customer.email }}">
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Reset password <span class="text-muted">(leave blank to keep the current one)</span></label>
+                            <input type="password" id="password" name="password" class="form-control" minlength="8" autocomplete="new-password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <a href="{{ path('admin_customer_index') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Returns waiting for confirmation</h5>
+            <a href="{{ path('reservation_index', {status: 'return_pending'}) }}" class="small">View all</a>
+        </div>
+
+        {% if pendingReturns is empty %}
+            <p class="text-muted mb-0">No vehicle returns are waiting for confirmation.</p>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>No.</th>
+                            <th>Customer</th>
+                            <th>Vehicle</th>
+                            <th>Reported</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for reservation in pendingReturns|slice(0, 5) %}
+                        <tr>
+                            <td class="fw-semibold">{{ loop.index }}</td>
+
+                            <td>{{ reservation.user.name }}</td>
+
+                            <td>{{ reservation.vehicle.name }}</td>
+
+                            <td>
+                                {% if reservation.returnCondition == 'damage' %}
+                                    <span class="badge bg-danger">Damage</span>
+                                {% else %}
+                                    <span class="badge bg-success">No damage</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-end">
+                                <a href="{{ path('reservation_show', {id: reservation.id}) }}"
+                                   class="btn btn-sm btn-primary">
+                                    Review
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</div>

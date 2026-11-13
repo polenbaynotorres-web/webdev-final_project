@@ -31,7 +31,7 @@
 
             <a href="{{ path('staff_dashboard') }}"
                class="{{ app.request.attributes.get('_route') == 'staff_dashboard' ? 'active' : '' }}">
-                <span class="sidebar-icon">▦</span>
+                <span class="sidebar-icon">&#9638;</span>
                 <span>Dashboard</span>
             </a>
 
@@ -39,29 +39,29 @@
 
             <a href="{{ path('vehicle_index') }}"
                class="{{ app.request.attributes.get('_route') starts with 'vehicle_' ? 'active' : '' }}">
-                <span class="sidebar-icon">🚗</span>
+                <span class="sidebar-icon">&#128663;</span>
                 <span>Manage Vehicles</span>
             </a>
 
-            <a href="#" class="sidebar-disabled" aria-disabled="true" title="Coming soon">
-                <span class="sidebar-icon">▤</span>
-                <span>Reservations</span>
-                <small>Coming soon</small>
-            </a>
+            <a href="{{ path('reservation_index') }}" class="{{ app.request.attributes.get('_route') starts with 'reservation_' ? 'active' : '' }}"><span class="sidebar-icon">&#9636;</span><span>Reservations</span></a>
+
+            <a href="{{ path('manage_return_index') }}" class="{{ app.request.attributes.get('_route') starts with 'manage_return_' ? 'active' : '' }}"><span class="sidebar-icon">&#8635;</span><span>Vehicle Returns</span></a>
+
+            <a href="{{ path('staff_profile') }}" class="{{ app.request.attributes.get('_route') == 'staff_profile' ? 'active' : '' }}"><span class="sidebar-icon">&#128100;</span><span>My Profile</span></a>
 
         </nav>
 
         <div class="sidebar-bottom">
 
             <a href="/">
-                <span class="sidebar-icon">⌂</span>
+                <span class="sidebar-icon">&#x2302;</span>
                 <span>View Homepage</span>
             </a>
 
             <form method="post" action="{{ path('app_logout') }}">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
                 <button type="submit" class="sidebar-logout">
-                    <span class="sidebar-icon">⇥</span>
+                    <span class="sidebar-icon">&#x21E5;</span>
                     <span>Logout</span>
                 </button>
             </form>
@@ -86,7 +86,7 @@
                         aria-label="Collapse sidebar"
                         aria-controls="staffSidebar"
                         aria-expanded="true">
-                    ☰
+                    &#x2630;
                 </button>
 
                 <div class="admin-heading">

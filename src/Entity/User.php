@@ -17,6 +17,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public const ROLE_ADMIN = 'admin';
     public const ROLE_STAFF = 'staff';
 
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_DISABLED = 'disabled';
+    public const STATUS_DELETED = 'deleted';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(options: ['unsigned' => true])]
@@ -39,6 +43,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         columnDefinition: "ENUM('user','admin','staff') NOT NULL DEFAULT 'user'"
     )]
     private ?string $role = 'user';
+
+    #[ORM\Column(name: 'status', length: 20, options: ['default' => self::STATUS_ACTIVE])]
+    private string $status = self::STATUS_ACTIVE;
 
     #[ORM\Column(
         name: 'created_at',
@@ -154,6 +161,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->role = $role;
 
         return $this;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        if (!in_array($status, [
+            self::STATUS_ACTIVE,
+            self::STATUS_DISABLED,
+            self::STATUS_DELETED,
+        ], true)) {
+            throw new \InvalidArgumentException('Invalid account status.');
+        }
+
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === self::STATUS_ACTIVE;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->status === self::STATUS_DELETED;
     }
 
     public function getCreatedAt(): ?\DateTime

@@ -2,8 +2,8 @@ FROM php:8.4-apache
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        git unzip libicu-dev libzip-dev \
-    && docker-php-ext-install -j"$(nproc)" intl pdo_mysql zip opcache \
+        git unzip libicu-dev libzip-dev libonig-dev libxml2-dev \
+    && docker-php-ext-install -j"$(nproc)" intl mbstring pdo_mysql zip opcache dom \
     && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/*
 

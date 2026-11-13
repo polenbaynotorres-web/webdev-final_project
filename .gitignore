@@ -1,25 +1,29 @@
-
-###> symfony/framework-bundle ###
 /.env.local
-/.env.local.php
 /.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/var/
 /vendor/
-###< symfony/framework-bundle ###
-
-###> phpunit/phpunit ###
-/phpunit.xml
+/var/
+/node_modules/
 /.phpunit.cache/
-###< phpunit/phpunit ###
+/coverage/
+/public/build/
+/public/uploads/vehicle-returns/*
+/public/uploads/vehicles/colors/*
+!/public/uploads/vehicle-returns/.gitkeep
+/torres_rental_backup*.sql
+/torres_schema_docker.sql
+/database/
 
-###> symfony/asset-mapper ###
-/public/assets/
-/assets/vendor/
-###< symfony/asset-mapper ###
-
-# Environment variables and secrets
+# Environment secrets
 /.env
-/.env.*
-!/.env.example
+/.env.local
+
+# Local database dumps
+/torres_rental_before_import.sql
+
+# Uploaded user files
+/public/uploads/**
+!/public/uploads/vehicle-returns/
+!/public/uploads/vehicle-returns/.gitkeep
+
+# Generated or temporary files
+/book_template_readable.txt

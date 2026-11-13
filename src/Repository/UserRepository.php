@@ -16,6 +16,34 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    /**
+     * Search accounts of a specific role.
+     * Deleted accounts are excluded.
+     *
+     * @return User[]
+     */
+    public function searchByRole(string $role, string $search = ''): array
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->andWhere('u.role = :role')
+            ->andWhere('u.status != :deleted')
+            ->setParameter('role', $role)
+            ->setParameter('deleted', User::STATUS_DELETED)
+            ->orderBy('u.createdAt', 'DESC');
+
+        $search = trim($search);
+
+        if ($search !== '') {
+            $qb->andWhere(
+                'LOWER(u.name) LIKE :search
+                 OR LOWER(u.username) LIKE :search
+                 OR LOWER(u.email) LIKE :search'
+            )->setParameter('search', '%' . mb_strtolower($search) . '%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function findOneByIdentifier(string $identifier): ?User
     {
         $identifier = mb_strtolower(trim($identifier));
